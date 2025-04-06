@@ -26,16 +26,15 @@ export function Sidebar() {
     }
   }, [location, isMobile, setSidebarOpen]);
 
-  // Determina se a barra lateral deve ser mostrada, baseado na combinação de estado e tamanho de tela
-  const showSidebar = sidebarOpen;
+  if (!sidebarOpen) {
+    return null; // Se o sidebar estiver fechado, não renderiza nada
+  }
 
   return (
     <>
-      {/* Sidebar - visível condicionalmente */}
-      <aside
-        className={`w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 fixed inset-y-0 left-0 transform transition-transform duration-300 ease-in-out z-30 overflow-y-auto h-full ${
-          showSidebar ? "translate-x-0" : "-translate-x-full"
-        }`}
+      {/* Sidebar visível */}
+      <aside 
+        className="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg overflow-y-auto h-full"
       >
         <nav className="mt-5 px-4 pb-8">
           <div className="space-y-1">
@@ -93,14 +92,12 @@ export function Sidebar() {
         </nav>
       </aside>
 
-      {/* Backdrop para fechar o sidebar (apenas em telas menores) */}
-      {sidebarOpen && (
-        <div
-          onClick={toggleSidebar}
-          className="fixed inset-0 bg-gray-900 bg-opacity-50 z-20 lg:hidden"
-          aria-hidden="true"
-        ></div>
-      )}
+      {/* Backdrop para fechar o sidebar */}
+      <div
+        onClick={() => setSidebarOpen(false)}
+        className="fixed inset-0 bg-gray-900 bg-opacity-50 z-30"
+        aria-hidden="true"
+      ></div>
     </>
   );
 }
