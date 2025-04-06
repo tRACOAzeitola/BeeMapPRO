@@ -12,6 +12,8 @@ import Climate from "@/pages/climate";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { useTheme } from "@/contexts/theme-context";
+import { NotificationProvider } from "@/contexts/notification-context";
+import { ThemeProvider } from "@/contexts/theme-context";
 
 function Router() {
   const { sidebarOpen } = useTheme();
@@ -40,8 +42,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
-      <Toaster />
+      <ThemeProvider>
+        <NotificationProvider>
+          <Router />
+          <Toaster />
+        </NotificationProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

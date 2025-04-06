@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bug, Bell, Sun, Moon, Menu } from "lucide-react";
+import { Bug, Sun, Moon, Menu } from "lucide-react";
 import { useTheme } from "@/contexts/theme-context";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { NewMobileMenu } from "./new-mobile-menu";
+import { NotificationMenu } from "./notification-menu";
 
 export function Header() {
   const { isDarkMode, toggleDarkMode, toggleSidebar, sidebarOpen, setSidebarOpen } = useTheme();
@@ -50,16 +51,7 @@ export function Header() {
         {/* Navigation Controls */}
         <div className="flex items-center space-x-4">
           {/* Notifications */}
-          <button 
-            className="text-gray-500 hover:text-amber-500 dark:text-gray-400 dark:hover:text-amber-300 relative"
-            aria-label="Notificações"
-            title="Notificações"
-          >
-            <Bell className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center" aria-hidden="true">
-              3
-            </span>
-          </button>
+          <NotificationMenu />
 
           {/* Dark Mode Toggle */}
           <button

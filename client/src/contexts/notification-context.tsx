@@ -52,11 +52,75 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }));
       } catch (e) {
         console.error('Failed to parse saved notifications', e);
-        return [];
+        // Retornar notificações iniciais de demonstração
+        return getDemoNotifications();
       }
     }
-    return [];
+    // Retornar notificações iniciais de demonstração
+    return getDemoNotifications();
   });
+  
+  // Função para gerar notificações de demonstração
+  function getDemoNotifications(): Notification[] {
+    return [
+      {
+        id: 'demo-1',
+        title: 'Alerta de Temperatura Alta',
+        message: 'Temperatura no Apiário Lousã está acima de 35°C. As colmeias podem precisar de ventilação adicional.',
+        type: 'warning',
+        date: new Date(Date.now() - 1000 * 60 * 30), // 30 minutos atrás
+        read: false,
+        source: 'weather',
+        sourceId: 1,
+        action: {
+          label: 'Ver Clima',
+          href: '/climate'
+        }
+      },
+      {
+        id: 'demo-2',
+        title: 'Colmeia Fraca Detectada',
+        message: 'A colmeia Bravo-12 do Apiário Serra está fraca e pode precisar de atenção.',
+        type: 'danger',
+        date: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 horas atrás
+        read: false,
+        source: 'hive',
+        sourceId: 2,
+        action: {
+          label: 'Ver Colmeia',
+          href: '/hives'
+        }
+      },
+      {
+        id: 'demo-3',
+        title: 'Floração Detectada',
+        message: 'Detectada floração de Lavanda próxima ao seu apiário.',
+        type: 'info',
+        date: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 dia atrás
+        read: true,
+        source: 'apiary',
+        sourceId: 1,
+        action: {
+          label: 'Ver Flora',
+          href: '/flora'
+        }
+      },
+      {
+        id: 'demo-4',
+        title: 'Condições Ideais para Inspeção',
+        message: 'As condições climáticas no Apiário Coimbra estão ideais para inspeção das colmeias hoje.',
+        type: 'success',
+        date: new Date(Date.now() - 1000 * 60 * 120), // 2 horas atrás
+        read: false,
+        source: 'weather',
+        sourceId: 3,
+        action: {
+          label: 'Ver Apiário',
+          href: '/apiaries'
+        }
+      }
+    ];
+  }
   
   const { toast } = useToast();
   
