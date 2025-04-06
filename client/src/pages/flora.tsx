@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { type FloraType } from "@shared/schema";
-import { Plus, Pencil, Trash2, Leaf } from "lucide-react";
+import { Plus, Pencil, Trash2, Leaf, Layers, MapPin } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -34,6 +34,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import FloraAnalysis from "@/components/flora/flora-analysis";
 
 export default function Flora() {
   const { toast } = useToast();
@@ -199,6 +201,8 @@ export default function Flora() {
     }
   };
 
+  const [activeTab, setActiveTab] = useState("catalog");
+
   return (
     <>
       <div className="mb-6 flex justify-between items-center">
@@ -208,84 +212,120 @@ export default function Flora() {
             Gerenciamento de tipos de plantas e floras para apicultura
           </p>
         </div>
-        <Button onClick={() => handleOpenForm()} className="flex items-center gap-1">
-          <Plus size={16} /> Novo Tipo de Flora
-        </Button>
+        <div className="flex space-x-2">
+          <Button 
+            onClick={() => handleOpenForm()} 
+            className="flex items-center gap-1"
+          >
+            <Plus size={16} /> Novo Tipo de Flora
+          </Button>
+        </div>
       </div>
 
-      <Card className="p-4">
-        {isLoading ? (
-          <div className="flex justify-center items-center p-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="catalog" className="flex items-center gap-2">
+            <Leaf size={16} />
+            <span>Catálogo de Flora</span>
+          </TabsTrigger>
+          <TabsTrigger value="analysis" className="flex items-center gap-2">
+            <Layers size={16} />
+            <span>Análise Geográfica</span>
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="catalog">
+          <Card className="p-4">
+            {isLoading ? (
+              <div className="flex justify-center items-center p-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : !floraTypes?.length ? (
+              <div className="text-center p-8">
+                <Leaf size={48} className="mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium">Nenhum tipo de flora cadastrado</h3>
+                <p className="text-gray-500 mt-2">
+                  Adicione informações sobre plantas melíferas para melhorar seu planejamento apícola
+                </p>
+                <Button onClick={() => handleOpenForm()} className="mt-4">
+                  Adicionar Tipo de Flora
+                </Button>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Época de Floração</TableHead>
+                    <TableHead>Qualidade do Néctar</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {floraTypes.map((flora) => (
+                    <TableRow key={flora.id}>
+                      <TableCell className="font-medium flex items-center gap-2">
+                        <Leaf size={16} className="text-green-500" />
+                        {flora.name}
+                      </TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeasonColor(flora.bloomingSeason)}`}>
+                          {flora.bloomingSeason === "Spring" && "Primavera"}
+                          {flora.bloomingSeason === "Summer" && "Verão"}
+                          {flora.bloomingSeason === "Fall" && "Outono"}
+                          {flora.bloomingSeason === "Winter" && "Inverno"}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getNectarQualityColor(flora.nectarQuality)}`}>
+                          {flora.nectarQuality === "High" && "Alta"}
+                          {flora.nectarQuality === "Medium" && "Média"}
+                          {flora.nectarQuality === "Low" && "Baixa"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleOpenForm(flora)}
+                          >
+                            <Pencil size={16} />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleDelete(flora)}
+                            className="text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/20"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="analysis" className="space-y-4">
+          <div className="bg-amber-50 dark:bg-amber-900/10 rounded-lg p-4 border border-amber-100 dark:border-amber-800/30 mb-4">
+            <div className="flex items-start">
+              <MapPin className="h-5 w-5 text-amber-500 mr-3 mt-0.5" />
+              <div>
+                <h3 className="font-medium text-amber-800 dark:text-amber-400">Ferramenta de Análise Geográfica</h3>
+                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                  Utilize o sensoriamento remoto e aprendizado de máquina para detectar áreas com alta concentração de plantas melíferas para apicultura
+                </p>
+              </div>
+            </div>
           </div>
-        ) : !floraTypes?.length ? (
-          <div className="text-center p-8">
-            <Leaf size={48} className="mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium">Nenhum tipo de flora cadastrado</h3>
-            <p className="text-gray-500 mt-2">
-              Adicione informações sobre plantas melíferas para melhorar seu planejamento apícola
-            </p>
-            <Button onClick={() => handleOpenForm()} className="mt-4">
-              Adicionar Tipo de Flora
-            </Button>
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Época de Floração</TableHead>
-                <TableHead>Qualidade do Néctar</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {floraTypes.map((flora) => (
-                <TableRow key={flora.id}>
-                  <TableCell className="font-medium flex items-center gap-2">
-                    <Leaf size={16} className="text-green-500" />
-                    {flora.name}
-                  </TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeasonColor(flora.bloomingSeason)}`}>
-                      {flora.bloomingSeason === "Spring" && "Primavera"}
-                      {flora.bloomingSeason === "Summer" && "Verão"}
-                      {flora.bloomingSeason === "Fall" && "Outono"}
-                      {flora.bloomingSeason === "Winter" && "Inverno"}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getNectarQualityColor(flora.nectarQuality)}`}>
-                      {flora.nectarQuality === "High" && "Alta"}
-                      {flora.nectarQuality === "Medium" && "Média"}
-                      {flora.nectarQuality === "Low" && "Baixa"}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleOpenForm(flora)}
-                      >
-                        <Pencil size={16} />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleDelete(flora)}
-                        className="text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/20"
-                      >
-                        <Trash2 size={16} />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </Card>
+          
+          <FloraAnalysis />
+        </TabsContent>
+      </Tabs>
 
       {/* Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
