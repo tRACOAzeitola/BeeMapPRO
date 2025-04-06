@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useTheme } from "@/contexts/theme-context";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   TrendingUp,
   Map,
@@ -17,21 +18,39 @@ import {
 export function MobileMenu() {
   const [location] = useLocation();
   const { sidebarOpen, setSidebarOpen } = useTheme();
+  const isMobile = useIsMobile();
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
 
-  if (!sidebarOpen) {
+  // Detecta o tamanho da tela de forma segura (evita erros de SSR)
+  useEffect(() => {
+    // Atualiza inicialmente
+    setIsLargeScreen(window.innerWidth >= 1024);
+    
+    // Monitora mudanças no tamanho da tela
+    const handleResize = () => {
+      setIsLargeScreen(window.innerWidth >= 1024);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Em dispositivos desktop usamos o sidebar normal, não este menu móvel
+  // Ou quando o menu está fechado
+  if (!sidebarOpen || isLargeScreen) {
     return null;
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-50 flex lg:hidden">
+      {/* Backdrop - usado para fechar o menu quando clicado */}
       <div
-        className="fixed inset-0 bg-black/50"
+        className="fixed inset-0 bg-black/50 transition-opacity duration-300 ease-in-out"
         onClick={() => setSidebarOpen(false)}
       />
 
-      {/* Menu */}
-      <div className="relative w-4/5 max-w-xs bg-white dark:bg-gray-800 shadow-xl overflow-y-auto">
+      {/* Menu Lateral */}
+      <div className="relative w-4/5 max-w-xs bg-white dark:bg-gray-800 shadow-xl overflow-y-auto animate-in slide-in-from-left duration-300">
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="text-lg font-bold text-amber-600 dark:text-amber-400">BeeMap Pro</div>
           <button
@@ -129,26 +148,31 @@ interface MenuItemProps {
 }
 
 function MenuItem({ href, icon, text, active }: MenuItemProps) {
+  const { setSidebarOpen } = useTheme();
+  const [_, navigate] = useLocation();
+  
+  const handleClick = () => {
+    // Fecha o menu e navega para a página
+    setSidebarOpen(false);
+    // Navega usando o wouter em vez de window.location para evitar recarregar a página
+    setTimeout(() => {
+      navigate(href);
+    }, 50);
+  };
+  
   return (
     <li>
-      <Link href={href}>
-        <a
-          className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
-            active
-              ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
-              : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-          }`}
-          onClick={(e) => {
-            // Prevent default to handle navigation manually
-            // This ensures the menu closes properly on navigation
-            e.preventDefault();
-            window.location.href = href;
-          }}
-        >
-          <span className="mr-3">{icon}</span>
-          {text}
-        </a>
-      </Link>
+      <div
+        className={`flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer ${
+          active
+            ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+            : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+        }`}
+        onClick={handleClick}
+      >
+        <span className="mr-3">{icon}</span>
+        {text}
+      </div>
     </li>
   );
 }
