@@ -21,19 +21,37 @@ export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isMobile = useIsMobile();
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Verificar preferência salva no localStorage primeiro, depois verificar preferência do sistema
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      return savedTheme === 'dark';
+    }
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
+  
   // Em dispositivos grandes, a barra lateral começa aberta
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
 
-  // Check for system preference on initial load
+  // Aplicar a classe dark ao elemento html quando o modo escuro estiver ativo
   useEffect(() => {
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    setIsDarkMode(prefersDark);
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    // Salvar a preferência no localStorage
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
 
-    // Listen for changes in color scheme preference
+  // Listen for changes in color scheme preference
+  useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = (e: MediaQueryListEvent) => {
-      setIsDarkMode(e.matches);
+      // Só atualizar automaticamente se não houver uma preferência salva
+      if (!localStorage.getItem('theme')) {
+        setIsDarkMode(e.matches);
+      }
     };
 
     mediaQuery.addEventListener("change", handleChange);
@@ -42,7 +60,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Toggle dark mode
   const toggleDarkMode = () => {
-    setIsDarkMode((prevMode) => !prevMode);
+    setIsDarkMode((prevMode) => {
+      const newMode = !prevMode;
+      localStorage.setItem('theme', newMode ? 'dark' : 'light');
+      return newMode;
+    });
   };
 
   // Toggle sidebar

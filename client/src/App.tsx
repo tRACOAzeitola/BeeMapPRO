@@ -38,14 +38,10 @@ function Router() {
 }
 
 function App() {
-  const { isDarkMode } = useTheme();
-
   return (
     <QueryClientProvider client={queryClient}>
-      <div className={isDarkMode ? "dark" : ""}>
-        <Router />
-        <Toaster />
-      </div>
+      <Router />
+      <Toaster />
     </QueryClientProvider>
   );
 }
