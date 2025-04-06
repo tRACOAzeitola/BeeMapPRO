@@ -78,8 +78,12 @@ export const insertWeatherDataSchema = createInsertSchema(weatherData).omit({
 export const floraTypes = pgTable("flora_types", {
   id: serial("id").primaryKey(),
   name: text("name").notNull().unique(),
-  bloomingSeason: text("blooming_season").notNull(),
-  nectarQuality: text("nectar_quality").notNull(),
+  scientificName: text("scientific_name"),
+  description: text("description"),
+  floweringSeason: text("flowering_season"),
+  type: text("type"), // 'melífera', 'polinifera', etc.
+  bloomingSeason: text("blooming_season"),
+  nectarQuality: text("nectar_quality"),
 });
 
 export const insertFloraTypeSchema = createInsertSchema(floraTypes).omit({

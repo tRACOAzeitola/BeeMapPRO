@@ -563,6 +563,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Flora detection endpoint
+  app.post("/api/flora/detect", async (req: Request, res: Response) => {
+    try {
+      const { image_data } = req.body;
+      
+      if (!image_data) {
+        return res.status(400).json({ 
+          success: false, 
+          error: "No image data provided" 
+        });
+      }
+      
+      // In a production environment, this would make a request to the Python service
+      // For now, we'll return a simple response to demonstrate the UI functionality
+      
+      // This is a simulation of processing time
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Generate a sample response
+      res.json({
+        success: true,
+        image_preview: image_data, // Use the same image for demonstration
+        stats: {
+          rosemary_coverage_percent: Math.random() * 30, // Random coverage between 0-30%
+          class_distribution: {
+            "0": 10000, // Background
+            "1": Math.floor(Math.random() * 2000), // Rosemary
+            "2": Math.floor(Math.random() * 5000)  // Other vegetation
+          }
+        },
+        metadata: {
+          image_size: [256, 256, 3],
+          ndvi_range: [-0.2, 0.8]
+        }
+      });
+    } catch (error) {
+      console.error("Error in flora detection:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: "Failed to process image for flora detection" 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
