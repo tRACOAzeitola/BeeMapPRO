@@ -1,23 +1,24 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "wouter";
+import React, { useEffect } from "react";
+import { useLocation, Link } from "wouter";
 import { useTheme } from "@/contexts/theme-context";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { 
-  TrendingUp, 
-  Map, 
-  Grid, 
-  Package, 
-  Leaf, 
-  CloudSun, 
-  ChartBar, 
+import {
+  TrendingUp,
+  Map,
+  Grid,
+  Package,
+  Leaf,
+  CloudSun,
+  ChartBar,
   Satellite, 
-  Crown 
+  Crown,
+  X 
 } from "lucide-react";
 
 export function Sidebar() {
   const [location] = useLocation();
   const isMobile = useIsMobile();
-  const { sidebarOpen, setSidebarOpen, toggleSidebar } = useTheme();
+  const { sidebarOpen, setSidebarOpen } = useTheme();
   
   // Close sidebar on route change when on mobile
   useEffect(() => {
@@ -26,17 +27,37 @@ export function Sidebar() {
     }
   }, [location, isMobile, setSidebarOpen]);
 
-  if (!sidebarOpen) {
-    return null; // Se o sidebar estiver fechado, não renderiza nada
-  }
-
   return (
     <>
-      {/* Sidebar visível */}
+      {/* Sidebar mobile drawer */}
+      <div 
+        className={`
+          fixed inset-0 bg-gray-900 bg-opacity-50 z-40 transition-opacity duration-300 ease-in-out
+          ${sidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}
+        `}
+        onClick={() => setSidebarOpen(false)}
+      />
+      
       <aside 
-        className="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg overflow-y-auto h-full"
+        className={`
+          fixed inset-y-0 left-0 z-50 w-[85%] max-w-[300px] bg-white dark:bg-gray-800 
+          border-r border-gray-200 dark:border-gray-700 shadow-2xl
+          transform transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
       >
-        <nav className="mt-5 px-4 pb-8">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-bold text-gray-800 dark:text-white">Menu</h2>
+          <button 
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Fechar menu"
+          >
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+          </button>
+        </div>
+        
+        <nav className="px-4 py-5">
           <div className="space-y-1">
             <NavItem href="/" icon={<TrendingUp />} active={location === "/"}>
               Dashboard
@@ -59,7 +80,7 @@ export function Sidebar() {
           </div>
 
           <div className="mt-8">
-            <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
+            <h3 className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
               Análises
             </h3>
             <div className="mt-2 space-y-1">
@@ -91,13 +112,6 @@ export function Sidebar() {
           </div>
         </nav>
       </aside>
-
-      {/* Backdrop para fechar o sidebar */}
-      <div
-        onClick={() => setSidebarOpen(false)}
-        className="fixed inset-0 bg-gray-900 bg-opacity-50 z-30"
-        aria-hidden="true"
-      ></div>
     </>
   );
 }
