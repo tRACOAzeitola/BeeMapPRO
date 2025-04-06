@@ -33,7 +33,7 @@ export const insertApiarySchema = createInsertSchema(apiaries).omit({
 // Hives table
 export const hives = pgTable("hives", {
   id: serial("id").primaryKey(),
-  apiaryId: integer("apiary_id").notNull(),
+  apiaryId: integer("apiary_id").notNull().references(() => apiaries.id),
   name: text("name").notNull(),
   status: text("status").notNull(), // 'good', 'weak', 'dead'
   notes: text("notes"),
@@ -47,7 +47,7 @@ export const insertHiveSchema = createInsertSchema(hives).omit({
 // Inventory items table
 export const inventoryItems = pgTable("inventory_items", {
   id: serial("id").primaryKey(),
-  apiaryId: integer("apiary_id").notNull(),
+  apiaryId: integer("apiary_id").notNull().references(() => apiaries.id),
   name: text("name").notNull(),
   category: text("category").notNull(),
   quantity: integer("quantity").notNull(),
@@ -61,7 +61,7 @@ export const insertInventoryItemSchema = createInsertSchema(inventoryItems).omit
 // Weather data table
 export const weatherData = pgTable("weather_data", {
   id: serial("id").primaryKey(),
-  apiaryId: integer("apiary_id").notNull(),
+  apiaryId: integer("apiary_id").notNull().references(() => apiaries.id),
   date: timestamp("date").defaultNow().notNull(),
   temperature: real("temperature").notNull(),
   humidity: real("humidity").notNull(),
