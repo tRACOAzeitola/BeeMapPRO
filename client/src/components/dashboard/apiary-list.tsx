@@ -177,10 +177,8 @@ const ApiaryList: React.FC<ApiaryListProps> = ({ apiaries, isLoading }) => {
           Mostrando {Math.min(apiaries.length, 3)} de {apiaries.length} apiários
         </div>
         <div>
-          <Link href="/apiaries">
-            <a className="text-sm text-amber-500 dark:text-amber-400 hover:underline flex items-center">
-              Ver Todos <ExternalLink className="ml-1 w-3 h-3" />
-            </a>
+          <Link href="/apiaries" className="text-sm text-amber-500 dark:text-amber-400 hover:underline flex items-center">
+            Ver Todos <ExternalLink className="ml-1 w-3 h-3" />
           </Link>
         </div>
       </div>
