@@ -30,7 +30,7 @@ export function Sidebar() {
     <>
       {/* Sidebar */}
       <aside
-        className={`w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 fixed inset-y-0 left-0 transform transition-transform duration-200 ease-in-out z-30 overflow-y-auto h-full ${
+        className={`w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 fixed lg:relative inset-y-0 left-0 transform transition-transform duration-200 ease-in-out z-30 lg:translate-x-0 overflow-y-auto h-full ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -90,11 +90,11 @@ export function Sidebar() {
         </nav>
       </aside>
 
-      {/* Backdrop para fechar o sidebar (em qualquer tamanho de tela) */}
+      {/* Backdrop para fechar o sidebar (apenas em telas menores) */}
       {sidebarOpen && (
         <div
           onClick={toggleSidebar}
-          className="fixed inset-0 bg-gray-900 bg-opacity-50 z-20"
+          className="fixed inset-0 bg-gray-900 bg-opacity-50 z-20 lg:hidden"
           aria-hidden="true"
         ></div>
       )}

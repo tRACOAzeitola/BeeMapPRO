@@ -22,8 +22,8 @@ export const useTheme = () => useContext(ThemeContext);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isMobile = useIsMobile();
   const [isDarkMode, setIsDarkMode] = useState(false);
-  // Por padrão, barra lateral fechada em todos os dispositivos
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Em dispositivos grandes, a barra lateral começa aberta
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
 
   // Check for system preference on initial load
   useEffect(() => {
