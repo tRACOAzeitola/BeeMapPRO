@@ -11,6 +11,7 @@ import Flora from "@/pages/flora";
 import Climate from "@/pages/climate";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
+import { MobileMenu } from "@/components/layout/mobile-menu";
 import { useTheme } from "@/contexts/theme-context";
 
 function Router() {
@@ -21,6 +22,7 @@ function Router() {
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
+        <MobileMenu />
         <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 lg:p-6 transition-all duration-200 ease-in-out">
           <Switch>
             <Route path="/" component={Dashboard} />
