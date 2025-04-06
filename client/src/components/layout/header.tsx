@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { NewMobileMenu } from "./new-mobile-menu";
 
 export function Header() {
   const { isDarkMode, toggleDarkMode, toggleSidebar, sidebarOpen, setSidebarOpen } = useTheme();
@@ -17,16 +18,25 @@ export function Header() {
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between p-4">
-        {/* Logo and Sidebar Toggle (visível em todas as telas) */}
+        {/* Logo and Sidebar Toggle */}
         <div className="flex items-center space-x-3">
-          <button
-            onClick={() => setSidebarOpen((prev: boolean) => !prev)}
-            className="text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-300 focus:outline-none transition-colors"
-            aria-label={sidebarOpen ? "Fechar menu lateral" : "Abrir menu lateral"}
-            title={sidebarOpen ? "Fechar menu lateral" : "Abrir menu lateral"}
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+          {/* Versão desktop do botão do menu */}
+          <div className="hidden lg:block">
+            <button
+              onClick={() => setSidebarOpen((prev: boolean) => !prev)}
+              className="text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-300 focus:outline-none transition-colors"
+              aria-label={sidebarOpen ? "Fechar menu lateral" : "Abrir menu lateral"}
+              title={sidebarOpen ? "Fechar menu lateral" : "Abrir menu lateral"}
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+          </div>
+          
+          {/* Versão móvel do menu usando o componente Sheet */}
+          <div className="lg:hidden">
+            <NewMobileMenu />
+          </div>
+          
           <div className="flex items-center">
             <span className="text-amber-500 text-2xl">
               <Bug className="w-6 h-6" />
