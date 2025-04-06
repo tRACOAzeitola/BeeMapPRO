@@ -26,12 +26,15 @@ export function Sidebar() {
     }
   }, [location, isMobile, setSidebarOpen]);
 
+  // Determina se a barra lateral deve ser mostrada, baseado na combinação de estado e tamanho de tela
+  const showSidebar = sidebarOpen;
+
   return (
     <>
-      {/* Sidebar */}
+      {/* Sidebar - visível condicionalmente */}
       <aside
-        className={`w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 fixed lg:relative inset-y-0 left-0 transform transition-transform duration-200 ease-in-out z-30 lg:translate-x-0 overflow-y-auto h-full ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 fixed inset-y-0 left-0 transform transition-transform duration-300 ease-in-out z-30 overflow-y-auto h-full ${
+          showSidebar ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <nav className="mt-5 px-4 pb-8">

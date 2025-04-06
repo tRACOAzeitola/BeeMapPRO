@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function Header() {
-  const { isDarkMode, toggleDarkMode, toggleSidebar, sidebarOpen } = useTheme();
+  const { isDarkMode, toggleDarkMode, toggleSidebar, sidebarOpen, setSidebarOpen } = useTheme();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   return (
@@ -20,7 +20,7 @@ export function Header() {
         {/* Logo and Sidebar Toggle (visível em todas as telas) */}
         <div className="flex items-center space-x-3">
           <button
-            onClick={toggleSidebar}
+            onClick={() => setSidebarOpen((prev: boolean) => !prev)}
             className="text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-300 focus:outline-none transition-colors"
             aria-label={sidebarOpen ? "Fechar menu lateral" : "Abrir menu lateral"}
             title={sidebarOpen ? "Fechar menu lateral" : "Abrir menu lateral"}

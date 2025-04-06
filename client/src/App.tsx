@@ -21,9 +21,7 @@ function Router() {
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className={`flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 lg:p-6 transition-all duration-200 ease-in-out ${
-          sidebarOpen ? 'lg:ml-64' : 'ml-0'
-        }`}>
+        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 lg:p-6 transition-all duration-200 ease-in-out">
           <Switch>
             <Route path="/" component={Dashboard} />
             <Route path="/apiaries" component={Apiaries} />
