@@ -70,7 +70,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
   };
 
   return (
-    <Card className="p-5 border border-gray-200 dark:border-gray-700">
+    <Card className="p-5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-card">
       <div className="flex justify-between items-center">
         <div>
           <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">{title}</p>
