@@ -124,7 +124,7 @@ export default function Climate() {
       </div>
 
       {isLoadingWeather || !weatherData ? (
-        <Card>
+        <Card className="bg-white dark:bg-card">
           <CardContent className="p-8">
             <div className="flex justify-center items-center">
               {isLoadingWeather ? (
@@ -140,7 +140,7 @@ export default function Climate() {
       ) : (
         <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
           {/* Current Weather Card */}
-          <Card>
+          <Card className="bg-white dark:bg-card">
             <CardHeader>
               <CardTitle className="flex justify-between items-center">
                 <span>Clima Atual</span>
@@ -210,12 +210,12 @@ export default function Climate() {
           </Card>
 
           {/* Forecast Card */}
-          <Card>
+          <Card className="bg-white dark:bg-card">
             <CardHeader>
               <CardTitle>Previsão para Próximos Dias</CardTitle>
             </CardHeader>
             <CardContent>
-              {weatherData.forecast && weatherData.forecast.days ? (
+              {weatherData.forecast && weatherData.forecast.days && Array.isArray(weatherData.forecast.days) ? (
                 <div className="grid grid-cols-3 gap-4">
                   {weatherData.forecast.days.map((day, index) => (
                     <div key={index} className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 text-center">
@@ -255,7 +255,7 @@ export default function Climate() {
           </Card>
 
           {/* Weather History */}
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-2 bg-white dark:bg-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
