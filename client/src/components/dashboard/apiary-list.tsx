@@ -48,7 +48,7 @@ const ApiaryList: React.FC<ApiaryListProps> = ({ apiaries, isLoading }) => {
   };
 
   return (
-    <Card className="col-span-2 p-5 border border-gray-200 dark:border-gray-700">
+    <Card className="col-span-2 p-5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-card">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-medium text-gray-800 dark:text-white">Apiários Recentes</h3>
         <div className="flex space-x-2">
@@ -110,7 +110,7 @@ const ApiaryList: React.FC<ApiaryListProps> = ({ apiaries, isLoading }) => {
                           <div className="text-xs text-gray-500 dark:text-gray-400">
                             Criado há{" "}
                             {Math.floor(
-                              (new Date().getTime() - new Date(apiary.createdAt).getTime()) /
+                              (new Date().getTime() - new Date(apiary.createdAt || new Date()).getTime()) /
                                 (1000 * 60 * 60 * 24 * 30)
                             )}{" "}
                             meses

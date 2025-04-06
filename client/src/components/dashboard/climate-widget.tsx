@@ -57,7 +57,7 @@ const ClimateWidget: React.FC = () => {
   };
 
   return (
-    <Card className="p-5 border border-gray-200 dark:border-gray-700">
+    <Card className="p-5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-card">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-medium text-gray-800 dark:text-white">Clima</h3>
         <button 
@@ -98,7 +98,7 @@ const ClimateWidget: React.FC = () => {
             Próximos Dias
           </h4>
           <div className="grid grid-cols-3 gap-2">
-            {weather?.forecast?.days ? (
+            {weather?.forecast && Array.isArray(weather.forecast.days) ? (
               weather.forecast.days.map((day: any, index: number) => (
                 <div key={index} className="bg-gray-50 dark:bg-gray-700 p-2 rounded-md text-center">
                   <p className="text-xs text-gray-500 dark:text-gray-400">{day.day}</p>

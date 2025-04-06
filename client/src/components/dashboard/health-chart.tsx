@@ -40,7 +40,7 @@ const HealthChart: React.FC<HealthChartProps> = ({ good, weak, dead, isLoading }
   const healthTrend = healthRate - previousHealthRate;
   
   return (
-    <Card className="p-5 border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <Card className="p-5 border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-card">
       <div className="flex justify-between items-center mb-4">
         <div>
           <h3 className="font-medium text-gray-800 dark:text-white text-lg">Saúde das Colmeias</h3>

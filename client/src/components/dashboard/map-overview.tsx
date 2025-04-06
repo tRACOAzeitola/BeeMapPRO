@@ -20,7 +20,7 @@ const MapOverview: React.FC<MapOverviewProps> = ({ apiaries }) => {
     : "bg-amber-50";
 
   return (
-    <Card className="p-5 border border-gray-200 dark:border-gray-700">
+    <Card className="p-5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-card">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-medium text-gray-800 dark:text-white">Mapa de Apiários</h3>
         <div className="flex space-x-2">
