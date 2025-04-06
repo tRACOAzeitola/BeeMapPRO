@@ -17,7 +17,7 @@ import {
 export function Sidebar() {
   const [location] = useLocation();
   const isMobile = useIsMobile();
-  const { sidebarOpen, setSidebarOpen } = useTheme();
+  const { sidebarOpen, setSidebarOpen, toggleSidebar } = useTheme();
   
   // Close sidebar on route change when on mobile
   useEffect(() => {
@@ -30,11 +30,11 @@ export function Sidebar() {
     <>
       {/* Sidebar */}
       <aside
-        className={`w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 fixed lg:static inset-y-0 left-0 transform transition-transform duration-200 ease-in-out z-30 lg:z-0 overflow-y-auto h-full ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        className={`w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 fixed inset-y-0 left-0 transform transition-transform duration-200 ease-in-out z-30 overflow-y-auto h-full ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <nav className="mt-5 px-4">
+        <nav className="mt-5 px-4 pb-8">
           <div className="space-y-1">
             <NavItem href="/" icon={<TrendingUp />} active={location === "/"}>
               Dashboard
@@ -90,11 +90,12 @@ export function Sidebar() {
         </nav>
       </aside>
 
-      {/* Backdrop for mobile sidebar */}
+      {/* Backdrop para fechar o sidebar (em qualquer tamanho de tela) */}
       {sidebarOpen && (
         <div
-          onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 bg-gray-900 bg-opacity-50 z-20 lg:hidden"
+          onClick={toggleSidebar}
+          className="fixed inset-0 bg-gray-900 bg-opacity-50 z-20"
+          aria-hidden="true"
         ></div>
       )}
     </>
@@ -111,8 +112,8 @@ type NavItemProps = {
 function NavItem({ href, icon, active, children }: NavItemProps) {
   return (
     <Link href={href}>
-      <a
-        className={`flex items-center px-4 py-3 text-sm font-medium rounded-md ${
+      <div
+        className={`flex items-center px-4 py-3 text-sm font-medium rounded-md cursor-pointer ${
           active
             ? "bg-amber-100 text-amber-700 dark:text-amber-300 dark:bg-amber-900/20"
             : "text-gray-600 hover:bg-gray-50 hover:text-amber-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-amber-300"
@@ -120,7 +121,7 @@ function NavItem({ href, icon, active, children }: NavItemProps) {
       >
         <span className="w-5 h-5 mr-3">{icon}</span>
         {children}
-      </a>
+      </div>
     </Link>
   );
 }

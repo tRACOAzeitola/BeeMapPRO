@@ -6,13 +6,15 @@ type ThemeContextType = {
   toggleDarkMode: () => void;
   sidebarOpen: boolean;
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleSidebar: () => void;
 };
 
 const ThemeContext = createContext<ThemeContextType>({
   isDarkMode: false,
   toggleDarkMode: () => {},
-  sidebarOpen: true,
+  sidebarOpen: false,
   setSidebarOpen: () => {},
+  toggleSidebar: () => {},
 });
 
 export const useTheme = () => useContext(ThemeContext);
@@ -20,7 +22,8 @@ export const useTheme = () => useContext(ThemeContext);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isMobile = useIsMobile();
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+  // Por padrão, barra lateral fechada em todos os dispositivos
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Check for system preference on initial load
   useEffect(() => {
@@ -42,19 +45,22 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setIsDarkMode((prevMode) => !prevMode);
   };
 
-  // Listen for window resize to handle sidebar state
+  // Toggle sidebar
+  const toggleSidebar = () => {
+    setSidebarOpen((prev) => !prev);
+  };
+
+  // Fechar a barra lateral automaticamente em dispositivos móveis quando a tela for redimensionada
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        setSidebarOpen(true);
-      } else {
+      if (window.innerWidth < 1024 && sidebarOpen) {
         setSidebarOpen(false);
       }
     };
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [sidebarOpen]);
 
   return (
     <ThemeContext.Provider
@@ -63,6 +69,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         toggleDarkMode,
         sidebarOpen,
         setSidebarOpen,
+        toggleSidebar,
       }}
     >
       {children}

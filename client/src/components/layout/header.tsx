@@ -11,17 +11,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function Header() {
-  const { isDarkMode, toggleDarkMode, setSidebarOpen } = useTheme();
+  const { isDarkMode, toggleDarkMode, toggleSidebar, sidebarOpen } = useTheme();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
       <div className="flex items-center justify-between p-4">
-        {/* Logo and Mobile Sidebar Toggle */}
+        {/* Logo and Sidebar Toggle (visível em todas as telas) */}
         <div className="flex items-center space-x-3">
           <button
-            onClick={() => setSidebarOpen(prev => !prev)}
-            className="text-gray-500 dark:text-gray-400 focus:outline-none lg:hidden"
+            onClick={toggleSidebar}
+            className="text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-300 focus:outline-none transition-colors"
+            aria-label={sidebarOpen ? "Fechar menu lateral" : "Abrir menu lateral"}
+            title={sidebarOpen ? "Fechar menu lateral" : "Abrir menu lateral"}
           >
             <Menu className="w-6 h-6" />
           </button>
@@ -38,9 +40,13 @@ export function Header() {
         {/* Navigation Controls */}
         <div className="flex items-center space-x-4">
           {/* Notifications */}
-          <button className="text-gray-500 hover:text-amber-500 dark:text-gray-400 dark:hover:text-amber-300 relative">
+          <button 
+            className="text-gray-500 hover:text-amber-500 dark:text-gray-400 dark:hover:text-amber-300 relative"
+            aria-label="Notificações"
+            title="Notificações"
+          >
             <Bell className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center" aria-hidden="true">
               3
             </span>
           </button>
@@ -49,6 +55,8 @@ export function Header() {
           <button
             onClick={toggleDarkMode}
             className="text-gray-500 hover:text-amber-500 dark:text-gray-400 dark:hover:text-amber-300"
+            aria-label={isDarkMode ? "Ativar modo claro" : "Ativar modo escuro"}
+            title={isDarkMode ? "Ativar modo claro" : "Ativar modo escuro"}
           >
             {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
@@ -56,7 +64,7 @@ export function Header() {
           {/* User Profile */}
           <DropdownMenu open={isProfileOpen} onOpenChange={setIsProfileOpen}>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center focus:outline-none">
+              <button className="flex items-center focus:outline-none" aria-label="Perfil de usuário" title="Perfil de usuário">
                 <Avatar className="w-8 h-8 bg-amber-500 text-white">
                   <AvatarFallback>AP</AvatarFallback>
                 </Avatar>
