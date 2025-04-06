@@ -14,12 +14,16 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { useTheme } from "@/contexts/theme-context";
 
 function Router() {
+  const { sidebarOpen } = useTheme();
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 lg:p-6">
+        <main className={`flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 lg:p-6 transition-all duration-200 ${
+          sidebarOpen ? 'lg:ml-0' : 'ml-0'
+        }`}>
           <Switch>
             <Route path="/" component={Dashboard} />
             <Route path="/apiaries" component={Apiaries} />
