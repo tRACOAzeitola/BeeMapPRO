@@ -1,257 +1,209 @@
 import {
-  users, type User, type InsertUser,
-  apiaries, type Apiary, type InsertApiary,
-  hives, type Hive, type InsertHive,
-  inventoryItems, type InventoryItem, type InsertInventoryItem,
-  weatherData, type WeatherData, type InsertWeatherData,
-  floraTypes, type FloraType, type InsertFloraType
+  type User, type InsertUser,
+  type Apiary, type InsertApiary,
+  type Hive, type InsertHive,
+  type InventoryItem, type InsertInventoryItem,
+  type WeatherData, type InsertWeatherData,
+  type FloraType, type InsertFloraType
 } from "@shared/schema";
-import { db } from "./db";
-import { eq, desc, and } from "drizzle-orm";
+import { IStorage } from "./storage";
 
-export interface IStorage {
-  // User methods (from original)
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+// In-memory storage for development
+export class InMemoryStorage implements IStorage {
+  private users: User[] = [];
+  private apiaries: Apiary[] = [];
+  private hives: Hive[] = [];
+  private inventoryItems: InventoryItem[] = [];
+  private weatherData: WeatherData[] = [];
+  private floraTypes: FloraType[] = [];
+  private nextIds = {
+    user: 1,
+    apiary: 1,
+    hive: 1,
+    inventoryItem: 1,
+    weatherData: 1,
+    floraType: 1
+  };
 
-  // Apiary methods
-  getApiaries(): Promise<Apiary[]>;
-  getApiary(id: number): Promise<Apiary | undefined>;
-  createApiary(apiary: InsertApiary): Promise<Apiary>;
-  updateApiary(id: number, apiary: Partial<InsertApiary>): Promise<Apiary | undefined>;
-  deleteApiary(id: number): Promise<boolean>;
-
-  // Hive methods
-  getHives(apiaryId?: number): Promise<Hive[]>;
-  getHive(id: number): Promise<Hive | undefined>;
-  getHivesByApiary(apiaryId: number): Promise<Hive[]>;
-  createHive(hive: InsertHive): Promise<Hive>;
-  updateHive(id: number, hive: Partial<InsertHive>): Promise<Hive | undefined>;
-  deleteHive(id: number): Promise<boolean>;
-
-  // Inventory methods
-  getInventoryItems(apiaryId?: number): Promise<InventoryItem[]>;
-  getInventoryItem(id: number): Promise<InventoryItem | undefined>;
-  createInventoryItem(item: InsertInventoryItem): Promise<InventoryItem>;
-  updateInventoryItem(id: number, item: Partial<InsertInventoryItem>): Promise<InventoryItem | undefined>;
-  deleteInventoryItem(id: number): Promise<boolean>;
-
-  // Weather data methods
-  getWeatherData(apiaryId: number): Promise<WeatherData | undefined>;
-  getWeatherDataHistory(apiaryId: number): Promise<WeatherData[]>;
-  saveWeatherData(data: InsertWeatherData): Promise<WeatherData>;
-
-  // Flora types methods
-  getFloraTypes(): Promise<FloraType[]>;
-  getFloraType(id: number): Promise<FloraType | undefined>;
-  createFloraType(floraType: InsertFloraType): Promise<FloraType>;
-  updateFloraType(id: number, floraType: Partial<InsertFloraType>): Promise<FloraType | undefined>;
-  deleteFloraType(id: number): Promise<boolean>;
-}
-
-export class DatabaseStorage implements IStorage {
-  // User methods (from original)
+  // User methods
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
+    return this.users.find(u => u.id === id);
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user;
+    return this.users.find(u => u.username === username);
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
+    const user = { ...insertUser, id: this.nextIds.user++ };
+    this.users.push(user);
     return user;
   }
 
   // Apiary methods
   async getApiaries(): Promise<Apiary[]> {
-    return await db.select().from(apiaries);
+    return [...this.apiaries];
   }
 
   async getApiary(id: number): Promise<Apiary | undefined> {
-    const [apiary] = await db.select().from(apiaries).where(eq(apiaries.id, id));
-    return apiary;
+    return this.apiaries.find(a => a.id === id);
   }
 
   async createApiary(insertApiary: InsertApiary): Promise<Apiary> {
-    const [apiary] = await db.insert(apiaries).values(insertApiary).returning();
+    const apiary = { 
+      ...insertApiary, 
+      id: this.nextIds.apiary++,
+      createdAt: new Date() 
+    } as Apiary;
+    this.apiaries.push(apiary);
     return apiary;
   }
 
   async updateApiary(id: number, updates: Partial<InsertApiary>): Promise<Apiary | undefined> {
-    const [updatedApiary] = await db
-      .update(apiaries)
-      .set(updates)
-      .where(eq(apiaries.id, id))
-      .returning();
-    return updatedApiary;
+    const index = this.apiaries.findIndex(a => a.id === id);
+    if (index === -1) return undefined;
+    
+    const updated = { ...this.apiaries[index], ...updates };
+    this.apiaries[index] = updated;
+    return updated;
   }
 
   async deleteApiary(id: number): Promise<boolean> {
-    const [deletedApiary] = await db
-      .delete(apiaries)
-      .where(eq(apiaries.id, id))
-      .returning({ id: apiaries.id });
-    return !!deletedApiary;
+    const initialLength = this.apiaries.length;
+    this.apiaries = this.apiaries.filter(a => a.id !== id);
+    return initialLength !== this.apiaries.length;
   }
 
   // Hive methods
   async getHives(apiaryId?: number): Promise<Hive[]> {
     if (apiaryId) {
-      return await db.select().from(hives).where(eq(hives.apiaryId, apiaryId));
+      return this.hives.filter(h => h.apiaryId === apiaryId);
     }
-    return await db.select().from(hives);
+    return [...this.hives];
   }
 
   async getHive(id: number): Promise<Hive | undefined> {
-    const [hive] = await db.select().from(hives).where(eq(hives.id, id));
-    return hive;
+    return this.hives.find(h => h.id === id);
   }
 
   async getHivesByApiary(apiaryId: number): Promise<Hive[]> {
-    return await db.select().from(hives).where(eq(hives.apiaryId, apiaryId));
+    return this.hives.filter(h => h.apiaryId === apiaryId);
   }
 
   async createHive(insertHive: InsertHive): Promise<Hive> {
-    const [hive] = await db.insert(hives).values(insertHive).returning();
+    const hive = { ...insertHive, id: this.nextIds.hive++ } as Hive;
+    this.hives.push(hive);
     return hive;
   }
 
   async updateHive(id: number, updates: Partial<InsertHive>): Promise<Hive | undefined> {
-    const [updatedHive] = await db
-      .update(hives)
-      .set(updates)
-      .where(eq(hives.id, id))
-      .returning();
-    return updatedHive;
+    const index = this.hives.findIndex(h => h.id === id);
+    if (index === -1) return undefined;
+    
+    const updated = { ...this.hives[index], ...updates };
+    this.hives[index] = updated;
+    return updated;
   }
 
   async deleteHive(id: number): Promise<boolean> {
-    const [deletedHive] = await db
-      .delete(hives)
-      .where(eq(hives.id, id))
-      .returning({ id: hives.id });
-    return !!deletedHive;
+    const initialLength = this.hives.length;
+    this.hives = this.hives.filter(h => h.id !== id);
+    return initialLength !== this.hives.length;
   }
 
   // Inventory methods
   async getInventoryItems(apiaryId?: number): Promise<InventoryItem[]> {
     if (apiaryId) {
-      return await db
-        .select()
-        .from(inventoryItems)
-        .where(eq(inventoryItems.apiaryId, apiaryId));
+      return this.inventoryItems.filter(i => i.apiaryId === apiaryId);
     }
-    return await db.select().from(inventoryItems);
+    return [...this.inventoryItems];
   }
 
   async getInventoryItem(id: number): Promise<InventoryItem | undefined> {
-    const [item] = await db
-      .select()
-      .from(inventoryItems)
-      .where(eq(inventoryItems.id, id));
-    return item;
+    return this.inventoryItems.find(i => i.id === id);
   }
 
   async createInventoryItem(insertItem: InsertInventoryItem): Promise<InventoryItem> {
-    const [item] = await db
-      .insert(inventoryItems)
-      .values(insertItem)
-      .returning();
+    const item = { ...insertItem, id: this.nextIds.inventoryItem++ } as InventoryItem;
+    this.inventoryItems.push(item);
     return item;
   }
 
   async updateInventoryItem(id: number, updates: Partial<InsertInventoryItem>): Promise<InventoryItem | undefined> {
-    const [updatedItem] = await db
-      .update(inventoryItems)
-      .set(updates)
-      .where(eq(inventoryItems.id, id))
-      .returning();
-    return updatedItem;
+    const index = this.inventoryItems.findIndex(i => i.id === id);
+    if (index === -1) return undefined;
+    
+    const updated = { ...this.inventoryItems[index], ...updates };
+    this.inventoryItems[index] = updated;
+    return updated;
   }
 
   async deleteInventoryItem(id: number): Promise<boolean> {
-    const [deletedItem] = await db
-      .delete(inventoryItems)
-      .where(eq(inventoryItems.id, id))
-      .returning({ id: inventoryItems.id });
-    return !!deletedItem;
+    const initialLength = this.inventoryItems.length;
+    this.inventoryItems = this.inventoryItems.filter(i => i.id !== id);
+    return initialLength !== this.inventoryItems.length;
   }
 
   // Weather data methods
   async getWeatherData(apiaryId: number): Promise<WeatherData | undefined> {
-    const [latestWeatherData] = await db
-      .select()
-      .from(weatherData)
-      .where(eq(weatherData.apiaryId, apiaryId))
-      .orderBy(desc(weatherData.date))
-      .limit(1);
-    return latestWeatherData;
+    const relevantData = this.weatherData
+      .filter(w => w.apiaryId === apiaryId)
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
+    
+    return relevantData[0];
   }
 
   async getWeatherDataHistory(apiaryId: number): Promise<WeatherData[]> {
-    return await db
-      .select()
-      .from(weatherData)
-      .where(eq(weatherData.apiaryId, apiaryId))
-      .orderBy(desc(weatherData.date));
+    return this.weatherData
+      .filter(w => w.apiaryId === apiaryId)
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
   }
 
   async saveWeatherData(insertData: InsertWeatherData): Promise<WeatherData> {
-    const [data] = await db
-      .insert(weatherData)
-      .values(insertData)
-      .returning();
+    const data = { 
+      ...insertData, 
+      id: this.nextIds.weatherData++,
+      date: insertData.date || new Date()
+    } as WeatherData;
+    
+    this.weatherData.push(data);
     return data;
   }
 
   // Flora types methods
   async getFloraTypes(): Promise<FloraType[]> {
-    return await db.select().from(floraTypes);
+    return [...this.floraTypes];
   }
 
   async getFloraType(id: number): Promise<FloraType | undefined> {
-    const [floraType] = await db
-      .select()
-      .from(floraTypes)
-      .where(eq(floraTypes.id, id));
-    return floraType;
+    return this.floraTypes.find(f => f.id === id);
   }
 
   async createFloraType(insertFloraType: InsertFloraType): Promise<FloraType> {
-    const [floraType] = await db
-      .insert(floraTypes)
-      .values(insertFloraType)
-      .returning();
+    const floraType = { ...insertFloraType, id: this.nextIds.floraType++ } as FloraType;
+    this.floraTypes.push(floraType);
     return floraType;
   }
 
   async updateFloraType(id: number, updates: Partial<InsertFloraType>): Promise<FloraType | undefined> {
-    const [updatedFloraType] = await db
-      .update(floraTypes)
-      .set(updates)
-      .where(eq(floraTypes.id, id))
-      .returning();
-    return updatedFloraType;
+    const index = this.floraTypes.findIndex(f => f.id === id);
+    if (index === -1) return undefined;
+    
+    const updated = { ...this.floraTypes[index], ...updates };
+    this.floraTypes[index] = updated;
+    return updated;
   }
 
   async deleteFloraType(id: number): Promise<boolean> {
-    const [deletedFloraType] = await db
-      .delete(floraTypes)
-      .where(eq(floraTypes.id, id))
-      .returning({ id: floraTypes.id });
-    return !!deletedFloraType;
+    const initialLength = this.floraTypes.length;
+    this.floraTypes = this.floraTypes.filter(f => f.id !== id);
+    return initialLength !== this.floraTypes.length;
   }
 
   // Helper method to seed initial data
   async seedInitialData() {
-    // Check if we already have data in the flora_types table
-    const existingFlora = await db.select().from(floraTypes);
-    if (existingFlora.length > 0) {
+    // Only seed if no data exists
+    if (this.floraTypes.length > 0) {
       console.log("Database already contains data, skipping seed");
       return;
     }
@@ -382,22 +334,6 @@ export class DatabaseStorage implements IStorage {
       weatherDataList.map(data => this.saveWeatherData(data))
     );
 
-    console.log("Database seeded successfully");
+    console.log("In-memory database seeded successfully");
   }
-}
-
-// Initialize the storage
-import { InMemoryStorage } from "./in-memory-storage";
-
-let storageImpl: IStorage;
-
-// Use in-memory storage for development when no database is available
-if (process.env.NODE_ENV === 'development' && !process.env.USE_DATABASE) {
-  console.log('Using in-memory storage for development');
-  storageImpl = new InMemoryStorage();
-} else {
-  console.log('Using database storage');
-  storageImpl = new DatabaseStorage();
-}
-
-export const storage = storageImpl;
+} 
