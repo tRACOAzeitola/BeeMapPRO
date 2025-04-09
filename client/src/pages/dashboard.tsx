@@ -20,6 +20,16 @@ type DashboardData = {
   };
 };
 
+type Apiary = {
+  id: number;
+  name: string;
+  location: string;
+  coordinates: string;
+  floraTypes: string[] | null;
+  floraDensity: string | null;
+  createdAt: Date | null;
+};
+
 export default function Dashboard() {
   const { toast } = useToast();
 
@@ -29,7 +39,7 @@ export default function Dashboard() {
   });
 
   // Fetch apiaries for the list
-  const { data: apiaries } = useQuery({
+  const { data: apiaries } = useQuery<Apiary[]>({
     queryKey: ['/api/apiaries'],
   });
 

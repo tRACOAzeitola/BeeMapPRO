@@ -39,12 +39,13 @@ Revolucionar a apicultura através de uma plataforma integrada que combina geolo
 
 ## Tecnologias Utilizadas
 
-- **Frontend**: React, TypeScript, TailwindCSS
+- **Frontend**: React, TypeScript, TailwindCSS, Framer Motion
 - **Backend**: Node.js, Express
 - **Banco de Dados**: PostgreSQL com Drizzle ORM
 - **Mapas**: Leaflet/React-Leaflet
 - **Visualização de Dados**: Recharts
 - **UI Components**: Shadcn/UI com Radix UI
+- **Roteamento**: React Router DOM
 - **API Climática**: Integração com serviços de dados meteorológicos
 - **Análise Geoespacial**: Processamento de imagens Sentinel-2
 
@@ -85,6 +86,32 @@ Revolucionar a apicultura através de uma plataforma integrada que combina geolo
 - ✓ Sistema de gestão de inventário
 - ✓ Integração com dados climáticos
 - ✓ Interface responsiva para diferentes dispositivos
+- ✓ Landing page completa com animações e secções informativas
+- ✓ Formulário de login com redirecionamento para o dashboard
+- ✓ Navegação intuitiva com rolagem suave para secções
+
+## Página Inicial (Landing Page)
+
+Nossa página inicial foi completamente redesenhada com:
+
+### 1. Design Moderno e Responsivo
+- Interface moderna e intuitiva usando Tailwind CSS
+- Layout completamente responsivo para todos os dispositivos
+- Experiência de usuário aprimorada com feedback visual
+
+### 2. Secções Informativas
+- **Como Funciona**: Apresentação do processo em 4 passos com círculos numerados e descrições detalhadas
+- **Benefícios**: Destaque de 6 vantagens principais com ícones de emoji e descrições detalhadas
+- **Sobre Nós**: Apresentação da missão da empresa e nossos três pilares tecnológicos principais
+- **Testemunhos**: Depoimentos de usuários reais da plataforma
+- **Preços**: Planos e opções para diferentes perfis de apicultores
+
+### 3. Elementos Interativos
+- Animações suaves utilizando Framer Motion
+- Menu de navegação com rolagem suave para secções
+- Formulário de login que redireciona para o dashboard
+- Cards animados na secção de preços e benefícios
+- Efeitos de hover em elementos interativos
 
 ## Próximos Desenvolvimentos
 
@@ -94,6 +121,8 @@ Revolucionar a apicultura através de uma plataforma integrada que combina geolo
 - Aplicativo móvel para uso em campo
 - Análise avançada de fatores climáticos
 - Ferramentas de colaboração para equipes de apicultores
+- Expansão das funcionalidades do dashboard com mais métricas e visualizações
+- Implementação completa de todos os planos de preços
 
 ---
 
@@ -107,10 +136,26 @@ Revolucionar a apicultura através de uma plataforma integrada que combina geolo
 
 1. Clone o repositório
 2. Instale as dependências
-3. Configure as variáveis de ambiente
+   ```
+   npm install
+   ```
+3. Configure as variáveis de ambiente (copie o arquivo .env.example para .env)
+   ```
+   cp .env.example .env
+   ```
 4. Execute as migrações do banco de dados
+   ```
+   npm run migrate
+   ```
 5. Inicie o servidor de desenvolvimento
+   ```
+   npm run dev
+   ```
 6. Acesse a aplicação em http://localhost:5000
+
+### Credenciais Demo
+- Email: demo@beemap.pro
+- Senha: demo123
 
 ---
 
@@ -122,6 +167,7 @@ Este projeto está licenciado sob a licença MIT - veja o arquivo LICENSE para d
 
 Email: contato@beemappro.com
 Website: https://beemappro.com
+Redes sociais: [@beemappro](https://twitter.com/beemappro)
 
 ---
 
