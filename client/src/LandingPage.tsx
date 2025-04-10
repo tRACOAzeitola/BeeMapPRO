@@ -239,9 +239,9 @@ const LandingPage: React.FC = () => {
       )}
 
       {/* How It Works Section */}
-      <section id="como-funciona" className="py-16 bg-white">
+      <section id="como-funciona" className={`py-16 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">Como Funciona</h2>
+          <h2 className={`text-3xl font-bold text-center mb-12 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Como Funciona</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {howItWorks.map((step, index) => (
               <motion.div
@@ -250,13 +250,13 @@ const LandingPage: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.2 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-lg shadow-lg p-6 border border-gray-200"
+                className={`${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} rounded-lg shadow-lg p-6 border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}
               >
                 <div className="w-12 h-12 bg-yellow-500 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4">
                   {step.step}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{step.title}</h3>
-                <p className="text-gray-600">{step.description}</p>
+                <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{step.title}</h3>
+                <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{step.description}</p>
               </motion.div>
             ))}
           </div>
@@ -264,9 +264,9 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Benefits Section */}
-      <section id="benefícios" className="py-16 bg-gray-50">
+      <section id="benefícios" className={`py-16 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">Benefícios</h2>
+          <h2 className={`text-3xl font-bold text-center mb-12 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Benefícios</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {benefits.map((benefit, index) => (
               <motion.div
@@ -275,11 +275,11 @@ const LandingPage: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.2 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-lg shadow-lg p-6 border border-gray-200"
+                className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'} rounded-lg shadow-lg p-6 border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}
               >
                 <div className="text-4xl mb-4">{benefit.icon}</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{benefit.title}</h3>
-                <p className="text-gray-600">{benefit.description}</p>
+                <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{benefit.title}</h3>
+                <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{benefit.description}</p>
               </motion.div>
             ))}
           </div>
@@ -287,15 +287,15 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* About Us Section */}
-      <section id="sobre-nós" className="py-16 bg-white">
+      <section id="sobre-nós" className={`py-16 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">Pioneiros na Apicultura de Precisão</h2>
-          <div className="max-w-3xl mx-auto text-center mb-12">
-            <p className="text-gray-600 mb-8">
+          <h2 className={`text-3xl font-bold text-center mb-12 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Pioneiros na Apicultura de Precisão</h2>
+          <div className={`max-w-3xl mx-auto text-center mb-12 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            <p className="mb-8">
               A BeeMap nasceu da combinação entre paixão pela apicultura e expertise em tecnologias avançadas. Nossa equipe multidisciplinar reúne apicultores experientes, engenheiros ambientais, cientistas de dados e especialistas em geoespacial para criar soluções que transformam a forma como a apicultura é praticada.
             </p>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Nossa Missão</h3>
-            <p className="text-gray-600">
+            <h3 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Nossa Missão</h3>
+            <p>
               Democratizar o acesso à tecnologia de ponta para apicultores de todos os portes, promovendo práticas sustentáveis que beneficiam tanto os produtores quanto os ecossistemas naturais.
             </p>
           </div>
@@ -304,11 +304,11 @@ const LandingPage: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="bg-white rounded-lg shadow-lg p-6 border border-gray-200"
+              className={`${isDarkMode ? 'bg-gray-900 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-200'} rounded-lg shadow-lg p-6 border`}
             >
               <div className="text-4xl mb-4">🧠</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Inteligência Artificial</h3>
-              <p className="text-gray-600">
+              <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Inteligência Artificial</h3>
+              <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 Utilizamos algoritmos avançados de aprendizado de máquina para analisar múltiplas camadas de dados geoespaciais, identificando padrões que o olho humano não consegue detectar.
               </p>
             </motion.div>
@@ -317,11 +317,11 @@ const LandingPage: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               viewport={{ once: true }}
-              className="bg-white rounded-lg shadow-lg p-6 border border-gray-200"
+              className={`${isDarkMode ? 'bg-gray-900 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-200'} rounded-lg shadow-lg p-6 border`}
             >
               <div className="text-4xl mb-4">🛰️</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Análise Geoespacial</h3>
-              <p className="text-gray-600">
+              <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Análise Geoespacial</h3>
+              <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 Integramos dados de satélite de última geração com resolução espacial e temporal superior, permitindo o monitoramento contínuo de floradas e condições climáticas.
               </p>
             </motion.div>
@@ -330,11 +330,11 @@ const LandingPage: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
               viewport={{ once: true }}
-              className="bg-white rounded-lg shadow-lg p-6 border border-gray-200"
+              className={`${isDarkMode ? 'bg-gray-900 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-200'} rounded-lg shadow-lg p-6 border`}
             >
               <div className="text-4xl mb-4">📱</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Tecnologia Acessível</h3>
-              <p className="text-gray-600">
+              <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Tecnologia Acessível</h3>
+              <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                 Desenvolvemos uma plataforma intuitiva que traduz dados complexos em informações práticas e acionáveis para apicultores de todos os níveis.
               </p>
             </motion.div>
@@ -343,9 +343,9 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 bg-gray-50">
+      <section className={`py-16 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">O Que Dizem Nossos Usuários</h2>
+          <h2 className={`text-3xl font-bold text-center mb-12 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>O Que Dizem Nossos Usuários</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <motion.div
@@ -354,11 +354,11 @@ const LandingPage: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.2 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-lg shadow-lg p-6 border border-gray-200"
+                className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'} rounded-lg shadow-lg p-6 border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}
               >
-                <p className="text-gray-600 italic mb-4">"{testimonial.quote}"</p>
-                <p className="font-semibold text-gray-900">{testimonial.author}</p>
-                <p className="text-gray-500">{testimonial.role}</p>
+                <p className={`italic mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>"{testimonial.quote}"</p>
+                <p className="font-semibold">{testimonial.author}</p>
+                <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{testimonial.role}</p>
               </motion.div>
             ))}
           </div>
@@ -366,9 +366,41 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Pricing Section */}
-      <section id="preços" className="py-16 bg-white">
+      <section id="preços" className={`py-16 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">Nossos Planos</h2>
+          <h2 className={`text-3xl font-bold text-center mb-12 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Nossos Planos</h2>
+          
+          {/* Free Trial Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className={`${
+              isDarkMode ? 'bg-gray-900' : 'bg-yellow-50'
+            } rounded-lg shadow-xl p-8 text-center border ${
+              isDarkMode ? 'border-yellow-500/20' : 'border-yellow-500/30'
+            } mb-12`}
+          >
+            <h2 className={`text-3xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              Experimente Gratuitamente por 14 Dias
+            </h2>
+            <p className={`text-xl mb-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              Acesso completo ao plano "Pro" — experimente a IA e o mapeamento de flora sem compromisso.
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-yellow-500 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-yellow-600 transition-colors shadow-lg"
+              onClick={() => setShowLogin(true)}
+            >
+              Começar Teste Gratuito
+            </motion.button>
+            <p className={`mt-4 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              Não é necessário cartão de crédito
+            </p>
+          </motion.div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {pricingPlans.map((plan, index) => (
               <motion.div
@@ -377,22 +409,38 @@ const LandingPage: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.2 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-lg shadow-lg p-6 border border-gray-200"
+                className={`${
+                  isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
+                } rounded-lg shadow-lg p-8 border`}
               >
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">{plan.name}</h3>
-                <p className="text-3xl font-bold text-yellow-600 mb-4">{plan.price}</p>
-                <p className="text-gray-600 mb-6">{plan.annualPrice}</p>
-                <ul className="space-y-3 mb-6">
+                <h3 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>{plan.name}</h3>
+                <div className="mb-6">
+                  <p className="text-3xl font-bold text-yellow-500 mb-1">{plan.price}</p>
+                  <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{plan.annualPrice}</p>
+                </div>
+                <ul className="space-y-4 mb-8">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-center">
-                      <svg className="w-5 h-5 text-yellow-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      <svg 
+                        className="w-5 h-5 text-yellow-500 mr-3 flex-shrink-0" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth="2" 
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
-                      {feature}
+                      <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        {feature}
+                      </span>
                     </li>
                   ))}
                 </ul>
-                <button className="w-full bg-yellow-500 text-white py-2 rounded-lg hover:bg-yellow-600 transition-colors">
+                <button className="w-full bg-yellow-500 text-white py-3 px-4 rounded-lg hover:bg-yellow-600 transition-colors font-semibold">
                   Começar Agora
                 </button>
               </motion.div>
