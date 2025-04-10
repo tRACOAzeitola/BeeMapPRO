@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '@/contexts/theme-context';
 
 const LandingPage: React.FC = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { isDarkMode, toggleDarkMode } = useTheme();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,21 +133,21 @@ const LandingPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-yellow-50">
+    <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gradient-to-b from-white to-yellow-50'}`}>
       {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-sm shadow-sm z-50">
+      <nav className={`fixed top-0 w-full ${isDarkMode ? 'bg-gray-800/80' : 'bg-white/80'} backdrop-blur-sm shadow-sm z-50`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex-shrink-0">
               <span className="text-2xl font-bold text-yellow-600">BeeMap</span>
             </div>
-            <div className="hidden md:flex space-x-8">
+            <div className="hidden md:flex space-x-8 items-center">
               {['Como Funciona', 'Benefícios', 'Preços', 'Sobre Nós'].map((item) => (
                 <motion.button
                   key={item}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="text-gray-600 hover:text-yellow-600 transition-colors"
+                  className={`${isDarkMode ? 'text-gray-300 hover:text-yellow-500' : 'text-gray-600 hover:text-yellow-600'} transition-colors`}
                   onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))}
                 >
                   {item}
@@ -159,6 +161,12 @@ const LandingPage: React.FC = () => {
               >
                 Acessar Aplicação
               </motion.button>
+              <button
+                onClick={toggleDarkMode}
+                className={`p-2 rounded-lg ${isDarkMode ? 'text-gray-300 hover:text-yellow-500' : 'text-gray-600 hover:text-yellow-600'}`}
+              >
+                {isDarkMode ? '🌞' : '🌙'}
+              </button>
             </div>
           </div>
         </div>
@@ -172,10 +180,10 @@ const LandingPage: React.FC = () => {
         className="pt-32 pb-16 px-4 sm:px-6 lg:px-8"
       >
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className={`text-4xl sm:text-5xl md:text-6xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
             BeeMap - Tecnologia para Apicultura de Precisão
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className={`text-xl ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} max-w-3xl mx-auto`}>
             Revolucionando a apicultura com tecnologia geoespacial e análise de dados
           </p>
         </div>
@@ -192,27 +200,31 @@ const LandingPage: React.FC = () => {
           <motion.div
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
-            className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full"
+            className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-8 rounded-lg shadow-xl max-w-md w-full`}
           >
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Login</h2>
+            <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>Login</h2>
             <form onSubmit={handleLogin}>
               <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Email</label>
+                <label className={`block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 ${
+                    isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                  }`}
                   placeholder="demo@beemap.pro"
                 />
               </div>
               <div className="mb-6">
-                <label className="block text-gray-700 mb-2">Password</label>
+                <label className={`block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Password</label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 ${
+                    isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                  }`}
                 />
               </div>
               <button

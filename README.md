@@ -4,7 +4,7 @@ Plataforma integrada de gestão e análise para apicultura de precisão.
 
 ## Sobre o Projeto
 
-BeeMap Pro é uma plataforma abrangente para gerenciamento e análise de apicultura que combina dados geoespaciais, análise climática, monitoramento de colmeias e rastreamento de flora melífera. Desenvolvida para revolucionar a prática apícola com tecnologia de ponta, nossa aplicação ajuda apicultores a otimizar suas operações, melhorar a saúde das colmeias e contribuir para a conservação das abelhas.
+BeeMap Pro é uma plataforma abrangente para gerenciamento e análise de apicultura que combina dados geoespaciais, análise climática, monitoramento de colmeias e rastreamento de flora melífera. Desenvolvida para revolucionar a prática apícola com tecnologia de ponta, a nossa aplicação ajuda apicultores a otimizar as suas operações, melhorar a saúde das colmeias e contribuir para a conservação das abelhas.
 
 ## Missão
 
@@ -18,7 +18,7 @@ Revolucionar a apicultura através de uma plataforma integrada que combina geolo
 - Análise de adequação do terreno e microclima
 
 ### 2. Monitoramento de Colmeias
-- Registro detalhado de cada colmeia com histórico de inspeções
+- Registo detalhado de cada colmeia com histórico de inspeções
 - Acompanhamento de saúde e produtividade
 - Alertas para inspeções e intervenções necessárias
 
@@ -30,10 +30,10 @@ Revolucionar a apicultura através de uma plataforma integrada que combina geolo
 ### 4. Mapeamento de Flora Melífera
 - Catálogo de plantas importantes para apicultura
 - Análise geoespacial de concentração de flora melífera
-- Detecção de rosmaninho e outras plantas via sensoriamento remoto
+- Deteção de rosmaninho e outras plantas via sensoriamento remoto
 
 ### 5. Gestão de Inventário
-- Controle de equipamentos e suprimentos
+- Controlo de equipamentos e consumíveis
 - Cronograma de manutenção
 - Previsão de necessidades baseada no crescimento do apiário
 
@@ -41,7 +41,7 @@ Revolucionar a apicultura através de uma plataforma integrada que combina geolo
 
 - **Frontend**: React, TypeScript, TailwindCSS, Framer Motion
 - **Backend**: Node.js, Express
-- **Banco de Dados**: PostgreSQL com Drizzle ORM
+- **Base de Dados**: PostgreSQL com Drizzle ORM
 - **Mapas**: Leaflet/React-Leaflet
 - **Visualização de Dados**: Recharts
 - **UI Components**: Shadcn/UI com Radix UI
@@ -53,7 +53,7 @@ Revolucionar a apicultura através de uma plataforma integrada que combina geolo
 
 ### Fase 1: Infraestrutura Básica e CRUD ✓
 - Configuração da arquitetura base do projeto
-- Implementação do banco de dados PostgreSQL
+- Implementação da base de dados PostgreSQL
 - Criação das interfaces de gestão de apiários e colmeias
 - Sistema de autenticação e autorização
 
@@ -63,13 +63,13 @@ Revolucionar a apicultura através de uma plataforma integrada que combina geolo
 - Gráficos de saúde e produtividade de colmeias
 - Integração inicial com dados climáticos
 
-### Fase 3: Análise de Flora e Integração de IA (Em Andamento) ⟶
-- Desenvolvimento do módulo de detecção de flora melífera
+### Fase 3: Análise de Flora e Integração de IA (Em Desenvolvimento) ⟶
+- Desenvolvimento do módulo de deteção de flora melífera
 - Implementação de análise geoespacial com imagens de satélite
 - Integração de algoritmos de machine learning para identificação de vegetação
 - Recomendações inteligentes para posicionamento de apiários
 
-### Fase 4: Mobile e Funcionalidades Avançadas (Planejado)
+### Fase 4: Mobile e Funcionalidades Avançadas (Planeado)
 - Desenvolvimento de aplicação móvel para trabalho em campo
 - Sincronização offline/online para áreas rurais
 - Sistema avançado de alertas e notificações
@@ -82,28 +82,29 @@ Revolucionar a apicultura através de uma plataforma integrada que combina geolo
 - ✓ Dashboard interativo com métricas e gráficos
 - ✓ Visualização geoespacial com mapas interativos
 - ✓ Módulo de gestão de flora melífera
-- ✓ Análise geoespacial experimental para detecção de flora
+- ✓ Análise geoespacial experimental para deteção de flora
 - ✓ Sistema de gestão de inventário
 - ✓ Integração com dados climáticos
 - ✓ Interface responsiva para diferentes dispositivos
 - ✓ Landing page completa com animações e secções informativas
 - ✓ Formulário de login com redirecionamento para o dashboard
 - ✓ Navegação intuitiva com rolagem suave para secções
+- ✓ Sistema de temas claro e escuro com integração completa
 
 ## Página Inicial (Landing Page)
 
-Nossa página inicial foi completamente redesenhada com:
+A nossa página inicial foi completamente redesenhada com:
 
 ### 1. Design Moderno e Responsivo
 - Interface moderna e intuitiva usando Tailwind CSS
 - Layout completamente responsivo para todos os dispositivos
-- Experiência de usuário aprimorada com feedback visual
+- Experiência de utilizador aprimorada com feedback visual
 
 ### 2. Secções Informativas
 - **Como Funciona**: Apresentação do processo em 4 passos com círculos numerados e descrições detalhadas
 - **Benefícios**: Destaque de 6 vantagens principais com ícones de emoji e descrições detalhadas
-- **Sobre Nós**: Apresentação da missão da empresa e nossos três pilares tecnológicos principais
-- **Testemunhos**: Depoimentos de usuários reais da plataforma
+- **Sobre Nós**: Apresentação da missão da empresa e os nossos três pilares tecnológicos principais
+- **Testemunhos**: Depoimentos de utilizadores reais da plataforma
 - **Preços**: Planos e opções para diferentes perfis de apicultores
 
 ### 3. Elementos Interativos
@@ -113,14 +114,22 @@ Nossa página inicial foi completamente redesenhada com:
 - Cards animados na secção de preços e benefícios
 - Efeitos de hover em elementos interativos
 
+### 4. Sistema de Temas Claro e Escuro
+- Alternância entre temas claro e escuro com um botão na navegação
+- Cores e estilos adaptados para cada tema
+- Persistência da preferência do tema
+- Deteção automática do tema do sistema
+- Transições suaves entre os temas
+- Todas as secções (navegação, hero, login, etc.) respeitam o tema selecionado e mantêm a consistência visual com o resto da aplicação
+
 ## Próximos Desenvolvimentos
 
 - Aprimoramento do módulo de análise de imagens de satélite
-- Implementação de machine learning funcional para detecção de flora
+- Implementação de machine learning funcional para deteção de flora
 - Funcionalidades de previsão e alerta
 - Aplicativo móvel para uso em campo
 - Análise avançada de fatores climáticos
-- Ferramentas de colaboração para equipes de apicultores
+- Ferramentas de colaboração para equipas de apicultores
 - Expansão das funcionalidades do dashboard com mais métricas e visualizações
 - Implementação completa de todos os planos de preços
 
@@ -139,11 +148,11 @@ Nossa página inicial foi completamente redesenhada com:
    ```
    npm install
    ```
-3. Configure as variáveis de ambiente (copie o arquivo .env.example para .env)
+3. Configure as variáveis de ambiente (copie o ficheiro .env.example para .env)
    ```
    cp .env.example .env
    ```
-4. Execute as migrações do banco de dados
+4. Execute as migrações da base de dados
    ```
    npm run migrate
    ```
@@ -151,24 +160,20 @@ Nossa página inicial foi completamente redesenhada com:
    ```
    npm run dev
    ```
-6. Acesse a aplicação em http://localhost:5000
+6. Aceda à aplicação em http://localhost:5000
 
-### Credenciais Demo
+### Credenciais de Demonstração
 - Email: demo@beemap.pro
-- Senha: demo123
+- Palavra-passe: demo123
 
 ---
 
 ## Licença
 
-Este projeto está licenciado sob a licença MIT - veja o arquivo LICENSE para detalhes.
+Este projeto está licenciado sob a licença MIT - veja o ficheiro LICENSE para detalhes.
 
-## Contato
+## Contacto
 
 Email: contato@beemappro.com
 Website: https://beemappro.com
 Redes sociais: [@beemappro](https://twitter.com/beemappro)
-
----
-
-Desenvolvido com ❤️ para a comunidade apícola e conservação das abelhas.
