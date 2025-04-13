@@ -1,0 +1,61 @@
+{
+  "common": {
+    "welcome": "Bem-vindo",
+    "login": "Entrar",
+    "logout": "Sair",
+    "profile": "Perfil",
+    "settings": "Configurações",
+    "close": "Fechar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "language": "Idioma"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Palavra-passe",
+    "login": "Iniciar sessão",
+    "register": "Registar",
+    "noAccount": "Não tem uma conta?",
+    "forgotPassword": "Esqueceu-se da palavra-passe?"
+  },
+  "dashboard": {
+    "title": "Painel de Controlo",
+    "overview": "Visão Geral",
+    "apiaries": "Apiários",
+    "hives": "Colmeias",
+    "production": "Produção",
+    "weather": "Meteorologia",
+    "tasks": "Tarefas"
+  },
+  "productivity": {
+    "title": "Produtividade",
+    "monthlyProduction": "Produção Mensal",
+    "totalProduction": "Produção Total",
+    "averageProduction": "Produção Média",
+    "honeyProduction": "Produção de Mel",
+    "waxProduction": "Produção de Cera",
+    "pollenProduction": "Produção de Pólen"
+  },
+  "geospatial": {
+    "title": "Dados Geoespaciais",
+    "map": "Mapa",
+    "layers": "Camadas",
+    "topography": "Topografia",
+    "vegetation": "Vegetação",
+    "temperature": "Temperatura",
+    "winds": "Ventos",
+    "area": "Área",
+    "statistics": "Estatísticas"
+  },
+  "settings": {
+    "title": "Configurações",
+    "account": "Conta",
+    "notifications": "Notificações",
+    "appearance": "Aparência",
+    "language": "Idioma",
+    "darkMode": "Modo Escuro",
+    "units": "Unidades",
+    "apiaries": "Apiários",
+    "hives": "Colmeias"
+  }
+} 

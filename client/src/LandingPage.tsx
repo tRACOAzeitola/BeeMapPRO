@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/contexts/theme-context';
+import { LoginForm } from "@/components/auth/login-form";
 
 const LandingPage: React.FC = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -189,53 +190,9 @@ const LandingPage: React.FC = () => {
         </div>
       </motion.section>
 
-      {/* Login Form */}
+      {/* Login Modal */}
       {showLogin && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 flex items-center justify-center"
-        >
-          <motion.div
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-8 rounded-lg shadow-xl max-w-md w-full`}
-          >
-            <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-6`}>Login</h2>
-            <form onSubmit={handleLogin}>
-              <div className="mb-4">
-                <label className={`block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 ${
-                    isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
-                  }`}
-                  placeholder="demo@beemap.pro"
-                />
-              </div>
-              <div className="mb-6">
-                <label className={`block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 ${
-                    isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
-                  }`}
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-yellow-500 text-white py-2 rounded-lg hover:bg-yellow-600 transition-colors"
-              >
-                Entrar
-              </button>
-            </form>
-          </motion.div>
-        </motion.div>
+        <LoginForm onClose={() => setShowLogin(false)} />
       )}
 
       {/* How It Works Section */}

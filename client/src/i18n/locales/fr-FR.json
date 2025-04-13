@@ -1,0 +1,72 @@
+{
+  "common": {
+    "welcome": "Bienvenue",
+    "howItWorks": "Comment ça marche",
+    "benefits": "Avantages",
+    "pricing": "Tarifs",
+    "about": "À propos",
+    "accessApp": "Accéder à l'application",
+    "login": "Se connecter",
+    "register": "S'inscrire",
+    "logout": "Se déconnecter",
+    "dashboard": "Tableau de bord",
+    "settings": "Paramètres",
+    "profile": "Profil",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "search": "Rechercher",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "warning": "Avertissement",
+    "info": "Information"
+  },
+  "auth": {
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "rememberMe": "Se souvenir de moi",
+    "noAccount": "Pas encore de compte ?",
+    "haveAccount": "Déjà un compte ?",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "sendResetLink": "Envoyer le lien de réinitialisation"
+  },
+  "dashboard": {
+    "overview": "Vue d'ensemble",
+    "analytics": "Analyses",
+    "reports": "Rapports",
+    "notifications": "Notifications",
+    "tasks": "Tâches",
+    "calendar": "Calendrier"
+  },
+  "productivity": {
+    "hiveManagement": "Gestion des ruches",
+    "hiveInspections": "Inspections des ruches",
+    "honeyProduction": "Production de miel",
+    "beeHealth": "Santé des abeilles",
+    "tasks": "Tâches",
+    "notes": "Notes",
+    "reminders": "Rappels"
+  },
+  "geospatial": {
+    "map": "Carte",
+    "hiveLocations": "Emplacements des ruches",
+    "forageAreas": "Zones de butinage",
+    "weather": "Météo",
+    "terrain": "Terrain",
+    "satellite": "Vue satellite"
+  },
+  "settings": {
+    "language": "Langue",
+    "theme": "Thème",
+    "notifications": "Notifications",
+    "account": "Compte",
+    "privacy": "Confidentialité",
+    "help": "Aide",
+    "about": "À propos"
+  }
+} 

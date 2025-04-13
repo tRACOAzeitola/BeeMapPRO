@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bug, Sun, Moon, Menu } from "lucide-react";
+import { Bug, Sun, Moon, Menu, LogOut } from "lucide-react";
 import { useTheme } from "@/contexts/theme-context";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -11,10 +11,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { NewMobileMenu } from "./new-mobile-menu";
 import { NotificationMenu } from "./notification-menu";
+import { useNavigate } from "react-router-dom";
 
 export function Header() {
   const { isDarkMode, toggleDarkMode, toggleSidebar, sidebarOpen, setSidebarOpen } = useTheme();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Limpar dados da sessão
+    sessionStorage.removeItem('isAuthenticated');
+    sessionStorage.removeItem('user');
+    
+    // Redirecionar para a página inicial
+    navigate('/');
+  };
 
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
@@ -73,10 +84,20 @@ export function Header() {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem>Perfil</DropdownMenuItem>
-              <DropdownMenuItem>Configurações</DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
+                <span>Perfil</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
+                <span>Configurações</span>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Sair</DropdownMenuItem>
+              <DropdownMenuItem 
+                className="cursor-pointer text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                onClick={handleLogout}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                <span>Sair</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

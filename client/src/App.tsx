@@ -9,6 +9,8 @@ import Hives from "@/pages/hives";
 import Inventory from "@/pages/inventory";
 import Flora from "@/pages/flora";
 import Climate from "@/pages/climate";
+import Productivity from "@/pages/productivity";
+import GeospatialData from "@/pages/geospatial";
 import LandingPage from "./LandingPage";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
@@ -57,6 +59,8 @@ function AppRoutes() {
       <Route path="/app/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />
       <Route path="/app/flora" element={<ProtectedRoute><Flora /></ProtectedRoute>} />
       <Route path="/app/climate" element={<ProtectedRoute><Climate /></ProtectedRoute>} />
+      <Route path="/app/productivity" element={<ProtectedRoute><Productivity /></ProtectedRoute>} />
+      <Route path="/app/geospatial" element={<ProtectedRoute><GeospatialData /></ProtectedRoute>} />
 
       {/* Catch all route */}
       <Route path="*" element={<NotFound />} />

@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, Link } from "wouter";
+import { useLocation, Link } from "react-router-dom";
 import { useTheme } from "@/contexts/theme-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 export function Sidebar() {
-  const [location] = useLocation();
+  const location = useLocation();
   const isMobile = useIsMobile();
   const { sidebarOpen } = useTheme();
   
@@ -28,22 +28,22 @@ export function Sidebar() {
     <div className="hidden lg:block w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
       <nav className="mt-5 px-4 pb-8">
         <div className="space-y-1">
-          <NavItem href="/" icon={<TrendingUp />} active={location === "/"}>
+          <NavItem href="/app/dashboard" icon={<TrendingUp />} active={location.pathname === "/app/dashboard"}>
             Dashboard
           </NavItem>
-          <NavItem href="/apiaries" icon={<Map />} active={location === "/apiaries"}>
+          <NavItem href="/app/apiaries" icon={<Map />} active={location.pathname === "/app/apiaries"}>
             Mapa de Apiários
           </NavItem>
-          <NavItem href="/hives" icon={<Grid />} active={location === "/hives"}>
+          <NavItem href="/app/hives" icon={<Grid />} active={location.pathname === "/app/hives"}>
             Gestão de Colmeias
           </NavItem>
-          <NavItem href="/inventory" icon={<Package />} active={location === "/inventory"}>
+          <NavItem href="/app/inventory" icon={<Package />} active={location.pathname === "/app/inventory"}>
             Inventário
           </NavItem>
-          <NavItem href="/flora" icon={<Leaf />} active={location === "/flora"}>
+          <NavItem href="/app/flora" icon={<Leaf />} active={location.pathname === "/app/flora"}>
             Flora
           </NavItem>
-          <NavItem href="/climate" icon={<CloudSun />} active={location === "/climate"}>
+          <NavItem href="/app/climate" icon={<CloudSun />} active={location.pathname === "/app/climate"}>
             Clima
           </NavItem>
         </div>
@@ -53,10 +53,10 @@ export function Sidebar() {
             Análises
           </h3>
           <div className="mt-2 space-y-1">
-            <NavItem href="#" icon={<ChartBar />}>
+            <NavItem href="/app/productivity" icon={<ChartBar />} active={location.pathname === "/app/productivity"}>
               Produtividade
             </NavItem>
-            <NavItem href="#" icon={<Satellite />}>
+            <NavItem href="/app/geospatial" icon={<Satellite />} active={location.pathname === "/app/geospatial"}>
               Dados Geoespaciais
             </NavItem>
           </div>
@@ -93,17 +93,13 @@ type NavItemProps = {
 
 function NavItem({ href, icon, active, children }: NavItemProps) {
   return (
-    <Link href={href}>
-      <div
-        className={`flex items-center px-4 py-3 text-sm font-medium rounded-md cursor-pointer ${
-          active
-            ? "bg-amber-100 text-amber-700 dark:text-amber-300 dark:bg-amber-900/20"
-            : "text-gray-600 hover:bg-gray-50 hover:text-amber-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-amber-300"
-        }`}
-      >
-        <span className="w-5 h-5 mr-3">{icon}</span>
-        {children}
-      </div>
+    <Link to={href} className={`flex items-center px-4 py-3 text-sm font-medium rounded-md ${
+      active
+        ? "bg-amber-100 text-amber-700 dark:text-amber-300 dark:bg-amber-900/20"
+        : "text-gray-600 hover:bg-gray-50 hover:text-amber-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-amber-300"
+    }`}>
+      <span className="w-5 h-5 mr-3">{icon}</span>
+      {children}
     </Link>
   );
 }

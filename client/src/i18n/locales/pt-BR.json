@@ -1,0 +1,67 @@
+{
+  "common": {
+    "welcome": "Bem-vindo",
+    "login": "Entrar",
+    "register": "Cadastrar",
+    "logout": "Sair",
+    "dashboard": "Painel de controle",
+    "settings": "Configurações",
+    "profile": "Perfil",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "add": "Adicionar",
+    "search": "Pesquisar",
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "warning": "Aviso",
+    "info": "Informação"
+  },
+  "auth": {
+    "email": "E-mail",
+    "password": "Senha",
+    "confirmPassword": "Confirmar senha",
+    "forgotPassword": "Esqueceu sua senha?",
+    "rememberMe": "Lembrar de mim",
+    "noAccount": "Não tem uma conta?",
+    "haveAccount": "Já tem uma conta?",
+    "resetPassword": "Redefinir senha",
+    "sendResetLink": "Enviar link de redefinição"
+  },
+  "dashboard": {
+    "overview": "Visão geral",
+    "analytics": "Análises",
+    "reports": "Relatórios",
+    "notifications": "Notificações",
+    "tasks": "Tarefas",
+    "calendar": "Calendário"
+  },
+  "productivity": {
+    "hiveManagement": "Gerenciamento de colmeias",
+    "hiveInspections": "Inspeções de colmeias",
+    "honeyProduction": "Produção de mel",
+    "beeHealth": "Saúde das abelhas",
+    "tasks": "Tarefas",
+    "notes": "Notas",
+    "reminders": "Lembretes"
+  },
+  "geospatial": {
+    "map": "Mapa",
+    "hiveLocations": "Localizações das colmeias",
+    "forageAreas": "Áreas de forrageamento",
+    "weather": "Clima",
+    "terrain": "Terreno",
+    "satellite": "Visualização por satélite"
+  },
+  "settings": {
+    "language": "Idioma",
+    "theme": "Tema",
+    "notifications": "Notificações",
+    "account": "Conta",
+    "privacy": "Privacidade",
+    "help": "Ajuda",
+    "about": "Sobre"
+  }
+} 

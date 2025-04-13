@@ -1,0 +1,67 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "profile": "Profile",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Info"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember Me",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "resetPassword": "Reset Password",
+    "sendResetLink": "Send Reset Link"
+  },
+  "dashboard": {
+    "overview": "Overview",
+    "analytics": "Analytics",
+    "reports": "Reports",
+    "notifications": "Notifications",
+    "tasks": "Tasks",
+    "calendar": "Calendar"
+  },
+  "productivity": {
+    "hiveManagement": "Hive Management",
+    "hiveInspections": "Hive Inspections",
+    "honeyProduction": "Honey Production",
+    "beeHealth": "Bee Health",
+    "tasks": "Tasks",
+    "notes": "Notes",
+    "reminders": "Reminders"
+  },
+  "geospatial": {
+    "map": "Map",
+    "hiveLocations": "Hive Locations",
+    "forageAreas": "Forage Areas",
+    "weather": "Weather",
+    "terrain": "Terrain",
+    "satellite": "Satellite View"
+  },
+  "settings": {
+    "language": "Language",
+    "theme": "Theme",
+    "notifications": "Notifications",
+    "account": "Account",
+    "privacy": "Privacy",
+    "help": "Help",
+    "about": "About"
+  }
+} 
