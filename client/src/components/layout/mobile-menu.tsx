@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "@/contexts/theme-context";
-import { useLocation } from "react-router-dom";
 import {
   TrendingUp,
   Map,
@@ -139,7 +138,10 @@ export function MobileMenu() {
             <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
               Desbloqueie análises avançadas e recomendações inteligentes
             </p>
-            <button className="mt-3 w-full text-xs bg-amber-400 hover:bg-amber-500 text-gray-800 font-medium py-2 px-3 rounded-md transition-colors">
+            <button 
+              className="mt-3 w-full text-xs bg-amber-400 hover:bg-amber-500 text-gray-800 font-medium py-2 px-3 rounded-md transition-colors"
+              onClick={() => setSidebarOpen(false)}
+            >
               Ver Planos
             </button>
           </div>
