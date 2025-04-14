@@ -4,7 +4,7 @@ Plataforma integrada de gestão e análise para apicultura de precisão.
 
 ## Sobre o Projeto
 
-BeeMap Pro é uma plataforma abrangente para gerenciamento e análise de apicultura que combina dados geoespaciais, análise climática, monitoramento de colmeias e rastreamento de flora melífera. Desenvolvida para revolucionar a prática apícola com tecnologia de ponta, a nossa aplicação ajuda apicultores a otimizar as suas operações, melhorar a saúde das colmeias e contribuir para a conservação das abelhas.
+BeeMap Pro é uma plataforma abrangente para gerenciamento e análise de apicultura que combina dados geoespaciais, análise climática, monitorização de colmeias e rastreamento de flora melífera. Desenvolvida para revolucionar a prática apícola com tecnologia de ponta, a nossa aplicação ajuda apicultores a otimizar as suas operações, melhorar a saúde das colmeias e contribuir para a conservação das abelhas.
 
 ## Missão
 
@@ -13,11 +13,11 @@ Revolucionar a apicultura através de uma plataforma integrada que combina geolo
 ## Funcionalidades Principais
 
 ### 1. Gestão de Apiários ✓
-- ✓ Cadastro e monitoramento de apiários com dados geoespaciais
+- ✓ Cadastro e monitorização de apiários com dados geoespaciais
 - ✓ Visualização em mapa interativo de todos os apiários
 - ✓ Análise de adequação do terreno e microclima
 
-### 2. Monitoramento de Colmeias ✓
+### 2. Monitorização de Colmeias ✓
 - ✓ Registo detalhado de cada colmeia com histórico de inspeções
 - ✓ Acompanhamento de saúde e produtividade
 - ✓ Alertas para inspeções e intervenções necessárias
@@ -25,19 +25,19 @@ Revolucionar a apicultura através de uma plataforma integrada que combina geolo
 ### 3. Análise Climática ✓
 - ✓ Integração com dados climáticos em tempo real
 - ✓ Previsões específicas para locais de apiários
-- ✓ Alertas de condições adversas para manejo
+- ✓ Alertas de condições adversas para maneio
 
 ### 4. Mapeamento de Flora Melífera (Em Desenvolvimento)
 - ✓ Catálogo de plantas importantes para apicultura
 - (Em Desenvolvimento) Análise geoespacial de concentração de flora melífera
-- (Em Desenvolvimento) Deteção de rosmaninho e outras plantas via sensoriamento remoto
+- (Em Desenvolvimento) Deteção de rosmaninho e outras plantas via deteção remota
 
 ### 5. Gestão de Inventário ✓
 - ✓ Controlo de equipamentos e consumíveis
 - ✓ Cronograma de manutenção
 - ✓ Previsão de necessidades baseada no crescimento do apiário
 
-### 6. Dashboard Avançado ✓
+### 6. Painel de Controlo Avançado ✓
 - ✓ Visualizações interativas com métricas e gráficos
 - ✓ Gráficos de produção mensal de mel
 - ✓ Análise de correlação entre atividade das colmeias e temperatura
@@ -45,21 +45,21 @@ Revolucionar a apicultura através de uma plataforma integrada que combina geolo
 - ✓ Gráfico radar de indicadores de saúde das colmeias
 - ✓ Sistema preditivo com projeções semanais e recomendações
 
-## Dashboard Aprimorado
+## Painel de Controlo Aprimorado
 
-O dashboard do BeeMap Pro foi atualizado com novas visualizações avançadas, proporcionando uma visão ainda mais completa da operação apícola, sem comprometer o layout e estilo original da aplicação.
+O painel de controlo do BeeMap Pro foi atualizado com novas visualizações avançadas, proporcionando uma visão ainda mais completa da operação apícola, sem comprometer o layout e estilo original da aplicação.
 
 ### Gráficos de Produção e Atividade ✓
 - ✓ **Gráfico de Produção de Mel**: Representação mensal da produção anual de mel, permitindo identificar padrões sazonais
 - ✓ **Gráfico de Atividade vs. Temperatura**: Correlação entre a atividade das colmeias e a temperatura nos últimos 7 dias
 
 ### Análise de Flora e Saúde das Colmeias ✓
-- ✓ **Gráfico de Composição da Vegetação (Pie Chart)**: Apresenta a distribuição das fontes de flora melífera identificadas na zona
+- ✓ **Gráfico de Composição da Vegetação (Gráfico Circular)**: Apresenta a distribuição das fontes de flora melífera identificadas na zona
 - ✓ **Gráfico Radar de Saúde das Colmeias**: Mostra múltiplos indicadores de saúde das colmeias de forma clara e visual
 - ✓ **Previsão de Produção e Recomendações Semanais**: Sistema preditivo com projeções semanais de produção e sugestões práticas para melhorar a eficiência e saúde do apiário
 
 ### Visão Global Aprimorada ✓
-O dashboard agora oferece:
+O painel de controlo agora oferece:
 - ✓ Métricas de produção e previsões futuras
 - ✓ Condições ambientais em tempo real
 - ✓ Indicadores de saúde das colmeias
@@ -67,8 +67,8 @@ O dashboard agora oferece:
 - ✓ Correlações entre atividade apícola e clima
 - ✓ Recomendações específicas baseadas em dados e padrões históricos
 
-Todos os componentes foram implementados com design responsivo, respeitando o estilo visual do dashboard original, incluindo:
-- ✓ Estilo dos cards, cores e estados de carregamento
+Todos os componentes foram implementados com design responsivo, respeitando o estilo visual do painel de controlo original, incluindo:
+- ✓ Estilo dos cartões, cores e estados de carregamento
 - ✓ Coerência com temas claro e escuro
 - ✓ Estrutura modular para fácil substituição de dados fictícios por chamadas reais à API, quando disponíveis
 
@@ -79,8 +79,8 @@ Todos os componentes foram implementados com design responsivo, respeitando o es
 - **Base de Dados**: PostgreSQL com Drizzle ORM ✓
 - **Mapas**: Leaflet/React-Leaflet ✓
 - **Visualização de Dados**: Recharts ✓
-- **UI Components**: Shadcn/UI com Radix UI ✓
-- **Roteamento**: React Router DOM ✓
+- **Componentes UI**: Shadcn/UI com Radix UI ✓
+- **Encaminhamento**: React Router DOM ✓
 - **API Climática**: Integração com serviços de dados meteorológicos ✓
 - **Análise Geoespacial**: Processamento de imagens Sentinel-2 (Em Desenvolvimento)
 
@@ -94,7 +94,7 @@ Todos os componentes foram implementados com design responsivo, respeitando o es
 
 ### Fase 2: Visualização Espacial e Análise ✓
 - ✓ Integração de mapas interativos
-- ✓ Dashboard com visualizações dinâmicas
+- ✓ Painel de controlo com visualizações dinâmicas
 - ✓ Gráficos de saúde e produtividade de colmeias
 - ✓ Integração inicial com dados climáticos
 
@@ -113,8 +113,8 @@ Todos os componentes foram implementados com design responsivo, respeitando o es
 ## Funcionalidades Implementadas
 
 - ✓ Sistema de cadastro e visualização de apiários
-- ✓ Gerenciamento completo de colmeias
-- ✓ Dashboard interativo com métricas e gráficos
+- ✓ Gestão completa de colmeias
+- ✓ Painel de controlo interativo com métricas e gráficos
 - ✓ Visualização geoespacial com mapas interativos
 - ✓ Módulo de gestão de flora melífera
 - ✓ Gráficos avançados de produção, saúde e análise ambiental
@@ -123,9 +123,9 @@ Todos os componentes foram implementados com design responsivo, respeitando o es
 - ✓ Sistema de gestão de inventário
 - ✓ Integração com dados climáticos
 - ✓ Interface responsiva para diferentes dispositivos
-- ✓ Landing page completa com animações e secções informativas
-- ✓ Formulário de login com redirecionamento para o dashboard
-- ✓ Navegação intuitiva com rolagem suave para secções
+- ✓ Página inicial completa com animações e secções informativas
+- ✓ Formulário de início de sessão com redirecionamento para o painel de controlo
+- ✓ Navegação intuitiva com deslocamento suave para secções
 - ✓ Sistema de temas claro e escuro com integração completa
 
 ## Página Inicial (Landing Page)
@@ -146,9 +146,9 @@ A nossa página inicial foi completamente redesenhada com:
 
 ### 3. Elementos Interativos ✓
 - ✓ Animações suaves utilizando Framer Motion
-- ✓ Menu de navegação com rolagem suave para secções
-- ✓ Formulário de login que redireciona para o dashboard
-- ✓ Cards animados na secção de preços e benefícios
+- ✓ Menu de navegação com deslocamento suave para secções
+- ✓ Formulário de início de sessão que redireciona para o painel de controlo
+- ✓ Cartões animados na secção de preços e benefícios
 - ✓ Efeitos de hover em elementos interativos
 
 ### 4. Sistema de Temas Claro e Escuro ✓
@@ -157,17 +157,17 @@ A nossa página inicial foi completamente redesenhada com:
 - ✓ Persistência da preferência do tema
 - ✓ Deteção automática do tema do sistema
 - ✓ Transições suaves entre os temas
-- ✓ Todas as secções (navegação, hero, login, etc.) respeitam o tema selecionado e mantêm a consistência visual com o resto da aplicação
+- ✓ Todas as secções (navegação, hero, início de sessão, etc.) respeitam o tema selecionado e mantêm a consistência visual com o resto da aplicação
 
 ## Próximos Desenvolvimentos
 
 - (Em Desenvolvimento) Aprimoramento do módulo de análise de imagens de satélite
 - (Em Desenvolvimento) Implementação de machine learning funcional para deteção de flora
 - (Em Desenvolvimento) Funcionalidades de previsão e alerta
-- (Em Desenvolvimento) Aplicativo móvel para uso em campo
+- (Em Desenvolvimento) Aplicação móvel para uso em campo
 - (Em Desenvolvimento) Análise avançada de fatores climáticos
 - (Em Desenvolvimento) Ferramentas de colaboração para equipas de apicultores
-- (Em Desenvolvimento) Expansão das funcionalidades do dashboard com mais métricas e visualizações
+- (Em Desenvolvimento) Expansão das funcionalidades do painel de controlo com mais métricas e visualizações
 - (Em Desenvolvimento) Implementação completa de todos os planos de preços
 
 ## Como Executar o Projeto

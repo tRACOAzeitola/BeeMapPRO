@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
-import { Cloud, CloudRain, Sun, Check, RefreshCw } from "lucide-react";
+import { Cloud, CloudRain, Sun, Check, RefreshCw, Flower2, AlertTriangle } from "lucide-react";
 import { fetchWeatherForLocation } from "@/lib/weather-service";
 
 const ClimateWidget: React.FC = () => {
@@ -133,14 +133,36 @@ const ClimateWidget: React.FC = () => {
             <h4 className="text-xs uppercase font-semibold text-gray-500 dark:text-gray-400 mb-2">
               Condições para Apicultura
             </h4>
-            <div className="bg-green-500/10 border border-green-500/30 rounded-md p-3">
-              <div className="flex items-center">
-                <div className="text-green-500 mr-2"><Check className="w-4 h-4" /></div>
-                <p className="text-sm text-gray-800 dark:text-white">Condições ótimas para inspeção</p>
+            <div className="space-y-2">
+              <div className="bg-green-500/10 border border-green-500/30 rounded-md p-3">
+                <div className="flex items-center">
+                  <div className="text-green-500 mr-2"><Check className="w-4 h-4" /></div>
+                  <p className="text-sm text-gray-800 dark:text-white">Condições ótimas para inspeção</p>
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  Temperatura acima de 20°C, sem previsão de chuva.
+                </p>
               </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                Temperatura acima de 20°C, sem previsão de chuva.
-              </p>
+
+              <div className="bg-purple-500/10 border border-purple-500/30 rounded-md p-3">
+                <div className="flex items-center">
+                  <div className="text-purple-500 mr-2"><Flower2 className="w-4 h-4" /></div>
+                  <p className="text-sm text-gray-800 dark:text-white">Floração de Rosmaninho</p>
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  Época de floração ideal detectada na área.
+                </p>
+              </div>
+
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-md p-3">
+                <div className="flex items-center">
+                  <div className="text-amber-500 mr-2"><AlertTriangle className="w-4 h-4" /></div>
+                  <p className="text-sm text-gray-800 dark:text-white">Alerta de Calor</p>
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  Temperaturas acima de 25°C previstas para a próxima semana.
+                </p>
+              </div>
             </div>
           </div>
         </>
