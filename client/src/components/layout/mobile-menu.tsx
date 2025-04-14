@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "wouter";
+import { Link } from "react-router-dom";
 import { useTheme } from "@/contexts/theme-context";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useLocation } from "react-router-dom";
 import {
   TrendingUp,
   Map,
@@ -16,12 +16,11 @@ import {
 } from "lucide-react";
 
 export function MobileMenu() {
-  const [location] = useLocation();
+  const location = useLocation();
   const { sidebarOpen, setSidebarOpen } = useTheme();
-  const isMobile = useIsMobile();
   const [isLargeScreen, setIsLargeScreen] = useState(false);
 
-  // Detecta o tamanho da tela de forma segura (evita erros de SSR)
+  // Detecta o tamanho da tela de forma segura
   useEffect(() => {
     // Atualiza inicialmente
     setIsLargeScreen(window.innerWidth >= 1024);
@@ -64,40 +63,46 @@ export function MobileMenu() {
         <nav className="px-2 py-4">
           <ul className="space-y-1">
             <MenuItem
-              href="/"
+              href="/app/dashboard"
               icon={<TrendingUp className="h-5 w-5" />}
               text="Dashboard"
-              active={location === "/"}
+              active={location.pathname === "/app/dashboard" || location.pathname === "/app"}
+              onClick={() => setSidebarOpen(false)}
             />
             <MenuItem
-              href="/apiaries"
+              href="/app/apiaries"
               icon={<Map className="h-5 w-5" />}
               text="Mapa de Apiários"
-              active={location === "/apiaries"}
+              active={location.pathname === "/app/apiaries"}
+              onClick={() => setSidebarOpen(false)}
             />
             <MenuItem
-              href="/hives"
+              href="/app/hives"
               icon={<Grid className="h-5 w-5" />}
               text="Gestão de Colmeias"
-              active={location === "/hives"}
+              active={location.pathname === "/app/hives"}
+              onClick={() => setSidebarOpen(false)}
             />
             <MenuItem
-              href="/inventory"
+              href="/app/inventory"
               icon={<Package className="h-5 w-5" />}
               text="Inventário"
-              active={location === "/inventory"}
+              active={location.pathname === "/app/inventory"}
+              onClick={() => setSidebarOpen(false)}
             />
             <MenuItem
-              href="/flora"
+              href="/app/flora"
               icon={<Leaf className="h-5 w-5" />}
               text="Flora"
-              active={location === "/flora"}
+              active={location.pathname === "/app/flora"}
+              onClick={() => setSidebarOpen(false)}
             />
             <MenuItem
-              href="/climate"
+              href="/app/climate"
               icon={<CloudSun className="h-5 w-5" />}
               text="Clima"
-              active={location === "/climate"}
+              active={location.pathname === "/app/climate"}
+              onClick={() => setSidebarOpen(false)}
             />
           </ul>
 
@@ -107,14 +112,18 @@ export function MobileMenu() {
             </h3>
             <ul className="mt-2 space-y-1">
               <MenuItem
-                href="#"
+                href="/app/productivity"
                 icon={<ChartBar className="h-5 w-5" />}
                 text="Produtividade"
+                active={location.pathname === "/app/productivity"}
+                onClick={() => setSidebarOpen(false)}
               />
               <MenuItem
-                href="#"
+                href="/app/geospatial"
                 icon={<Satellite className="h-5 w-5" />}
                 text="Dados Geoespaciais"
+                active={location.pathname === "/app/geospatial"}
+                onClick={() => setSidebarOpen(false)}
               />
             </ul>
           </div>
@@ -145,34 +154,24 @@ interface MenuItemProps {
   icon: React.ReactNode;
   text: string;
   active?: boolean;
+  onClick?: () => void;
 }
 
-function MenuItem({ href, icon, text, active }: MenuItemProps) {
-  const { setSidebarOpen } = useTheme();
-  const [_, navigate] = useLocation();
-  
-  const handleClick = () => {
-    // Fecha o menu e navega para a página
-    setSidebarOpen(false);
-    // Navega usando o wouter em vez de window.location para evitar recarregar a página
-    setTimeout(() => {
-      navigate(href);
-    }, 50);
-  };
-  
+function MenuItem({ href, icon, text, active, onClick }: MenuItemProps) {
   return (
     <li>
-      <div
+      <Link
+        to={href}
         className={`flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-pointer ${
           active
             ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
             : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
         }`}
-        onClick={handleClick}
+        onClick={onClick}
       >
         <span className="mr-3">{icon}</span>
         {text}
-      </div>
+      </Link>
     </li>
   );
 }

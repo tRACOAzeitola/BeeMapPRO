@@ -5,6 +5,10 @@ import MapOverview from "@/components/dashboard/map-overview";
 import HealthChart from "@/components/dashboard/health-chart";
 import ClimateWidget from "@/components/dashboard/climate-widget";
 import ApiaryList from "@/components/dashboard/apiary-list";
+import HoneyProductionChart from "@/components/dashboard/honey-production-chart";
+import ActivityTemperatureChart from "@/components/dashboard/activity-temperature-chart";
+import VegetationComposition from "@/components/dashboard/vegetation-composition";
+import ProductionForecast from "@/components/dashboard/production-forecast";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -56,13 +60,13 @@ export default function Dashboard() {
   return (
     <div>
       {/* Dashboard Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Dashboard</h2>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Visão geral da sua operação apícola</p>
       </div>
       
       {/* Stats Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
         <StatsCard 
           title="Total de Apiários"
           value={isLoading ? "..." : dashboardData?.apiaryCount.toString() || "0"}
@@ -101,7 +105,7 @@ export default function Dashboard() {
       </div>
       
       {/* Two Column Layout for Map and Health Status */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
         <MapOverview apiaries={apiaries || []} />
         <HealthChart 
           good={dashboardData?.hiveStatus.good || 0}
@@ -111,10 +115,28 @@ export default function Dashboard() {
         />
       </div>
       
+      {/* Production and Activity Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+        <HoneyProductionChart isLoading={isLoading} />
+        <ActivityTemperatureChart isLoading={isLoading} />
+      </div>
+      
+      {/* Three Column Layout for Vegetation and Production Forecast */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+        <div className="lg:col-span-1">
+          <VegetationComposition isLoading={isLoading} />
+        </div>
+        <div className="lg:col-span-2">
+          <ProductionForecast isLoading={isLoading} />
+        </div>
+      </div>
+      
       {/* Two Column Layout for Climate and Recent Apiaries */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <ClimateWidget />
-        <ApiaryList apiaries={apiaries || []} isLoading={isLoading} />
+        <div className="lg:col-span-2">
+          <ApiaryList apiaries={apiaries || []} isLoading={isLoading} />
+        </div>
       </div>
     </div>
   );

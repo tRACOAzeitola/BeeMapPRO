@@ -133,15 +133,15 @@ A nossa página inicial foi completamente redesenhada com:
 - (Em Desenvolvimento) Expansão das funcionalidades do dashboard com mais métricas e visualizações
 - (Em Desenvolvimento) Implementação completa de todos os planos de preços
 
----
-
 ## Como Executar o Projeto
 
-### Pré-requisitos
+### Opção 1: Execução Local
+
+#### Pré-requisitos
 - Node.js v18+ ✓
 - PostgreSQL 14+ ✓
 
-### Instalação
+#### Instalação
 
 1. Clone o repositório
 2. Instale as dependências
@@ -154,13 +154,38 @@ A nossa página inicial foi completamente redesenhada com:
    ```
 4. Execute as migrações da base de dados
    ```
-   npm run migrate
+   npm run db:push
    ```
 5. Inicie o servidor de desenvolvimento
    ```
    npm run dev
    ```
 6. Aceda à aplicação em http://localhost:5000
+
+### Opção 2: Execução com Docker
+
+#### Pré-requisitos
+- Docker
+- Docker Compose
+
+#### Instalação e Execução
+
+1. Clone o repositório
+2. Execute a plataforma com Docker Compose:
+   ```
+   docker-compose -f docker/docker-compose.yml up -d
+   ```
+3. Execute as migrações da base de dados:
+   ```
+   docker-compose -f docker/docker-compose.yml exec app npm run db:push
+   ```
+4. Aceda à aplicação em http://localhost:5000
+5. Para parar a aplicação:
+   ```
+   docker-compose -f docker/docker-compose.yml down
+   ```
+
+Consulte o ficheiro [docker/README.md](docker/README.md) para mais detalhes sobre a configuração Docker.
 
 ### Credenciais de Demonstração
 - Email: demo@beemap.pro

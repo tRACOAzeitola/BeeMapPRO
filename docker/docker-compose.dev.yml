@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    volumes:
+      - ../:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  python:
+    volumes:
+      - ../python:/app/python
+    command: python -m watchdog.observers.polling_observer python/main.py
+
+  pgadmin:
+    ports:
+      - "5050:80" 

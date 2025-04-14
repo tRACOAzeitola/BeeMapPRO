@@ -9,7 +9,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { NewMobileMenu } from "./new-mobile-menu";
+import { MobileMenuButton } from "./mobile-menu-button";
+import { MobileMenu } from "./mobile-menu";
 import { NotificationMenu } from "./notification-menu";
 import { useNavigate } from "react-router-dom";
 
@@ -44,9 +45,9 @@ export function Header() {
             </button>
           </div>
           
-          {/* Versão móvel do menu usando o componente Sheet */}
+          {/* Versão móvel do menu */}
           <div className="lg:hidden">
-            <NewMobileMenu />
+            <MobileMenuButton />
           </div>
           
           <div className="flex items-center">
@@ -102,6 +103,9 @@ export function Header() {
           </DropdownMenu>
         </div>
       </div>
+      
+      {/* Componente Mobile Menu */}
+      <MobileMenu />
     </header>
   );
 }
