@@ -27,10 +27,12 @@ Revolucionar a apicultura através de uma plataforma integrada que combina geolo
 - ✓ Previsões específicas para locais de apiários
 - ✓ Alertas de condições adversas para maneio
 
-### 4. Mapeamento de Flora Melífera (Em Desenvolvimento)
+### 4. Mapeamento de Flora Melífera ✓
 - ✓ Catálogo de plantas importantes para apicultura
-- (Em Desenvolvimento) Análise geoespacial de concentração de flora melífera
-- (Em Desenvolvimento) Deteção de rosmaninho e outras plantas via deteção remota
+- ✓ Análise geoespacial de concentração de flora melífera
+- ✓ Deteção de rosmaninho e outras plantas via seleção de área no mapa
+- ✓ Análise detalhada com visualização de resultados por área selecionada
+- ✓ Upload e identificação de imagens de flora
 
 ### 5. Gestão de Inventário ✓
 - ✓ Controlo de equipamentos e consumíveis
@@ -83,6 +85,7 @@ Todos os componentes foram implementados com design responsivo, respeitando o es
 - **Encaminhamento**: React Router DOM ✓
 - **API Climática**: Integração com serviços de dados meteorológicos ✓
 - **Análise Geoespacial**: Processamento de imagens Sentinel-2 (Em Desenvolvimento)
+- **Sistema de Notificações**: Toast notifications com contexto global ✓
 
 ## Fases de Desenvolvimento
 
@@ -98,10 +101,12 @@ Todos os componentes foram implementados com design responsivo, respeitando o es
 - ✓ Gráficos de saúde e produtividade de colmeias
 - ✓ Integração inicial com dados climáticos
 
-### Fase 3: Análise de Flora e Integração de IA (Em Desenvolvimento)
-- (Em Desenvolvimento) Desenvolvimento do módulo de deteção de flora melífera
-- (Em Desenvolvimento) Implementação de análise geoespacial com imagens de satélite
-- (Em Desenvolvimento) Integração de algoritmos de machine learning para identificação de vegetação
+### Fase 3: Análise de Flora e Integração de IA ✓
+- ✓ Desenvolvimento do módulo de deteção de flora melífera
+- ✓ Implementação de análise geoespacial de áreas selecionadas
+- ✓ Sistema de seleção interativa de áreas em mapa
+- ✓ Análise detalhada de composição vegetal por área
+- (Em Desenvolvimento) Integração de algoritmos avançados de machine learning para identificação de vegetação
 - (Em Desenvolvimento) Recomendações inteligentes para posicionamento de apiários
 
 ### Fase 4: Mobile e Funcionalidades Avançadas (Em Desenvolvimento)
@@ -116,17 +121,32 @@ Todos os componentes foram implementados com design responsivo, respeitando o es
 - ✓ Gestão completa de colmeias
 - ✓ Painel de controlo interativo com métricas e gráficos
 - ✓ Visualização geoespacial com mapas interativos
-- ✓ Módulo de gestão de flora melífera
+- ✓ Módulo completo de gestão de flora melífera
+- ✓ Análise de flora por área geográfica via mapa interativo
 - ✓ Gráficos avançados de produção, saúde e análise ambiental
 - ✓ Sistema preditivo de recomendações baseadas em dados
-- (Em Desenvolvimento) Análise geoespacial experimental para deteção de flora
 - ✓ Sistema de gestão de inventário
 - ✓ Integração com dados climáticos
 - ✓ Interface responsiva para diferentes dispositivos
 - ✓ Página inicial completa com animações e secções informativas
 - ✓ Formulário de início de sessão com redirecionamento para o painel de controlo
 - ✓ Navegação intuitiva com deslocamento suave para secções
-- ✓ Sistema de temas claro e escuro com integração completa
+- ✓ Sistema robusto de temas claro e escuro com integração completa
+- ✓ Sistema de notificações toast com suporte a variantes visual (sucesso, erro, info)
+
+## Melhorias Técnicas Recentes
+
+### Sistema de Temas Aprimorado ✓
+- ✓ Implementação de um sistema duplo de temas para maior flexibilidade
+- ✓ Suporte para preferências do sistema e escolhas do usuário
+- ✓ Transições visuais suaves entre temas
+- ✓ Persistência de preferências de tema entre sessões
+
+### Sistema de Notificações Toast ✓
+- ✓ Implementação de sistema contextual de notificações
+- ✓ Suporte para diferentes tipos (sucesso, erro, alerta, informação)
+- ✓ Design responsivo adaptado aos temas
+- ✓ Animações suaves de entrada e saída
 
 ## Página Inicial (Landing Page)
 
