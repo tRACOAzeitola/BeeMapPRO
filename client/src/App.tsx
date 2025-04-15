@@ -1,7 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./lib/queryClient";
-import { Toaster } from "@/components/ui/toaster";
+import { ToastProvider, ToastViewport } from "@/components/ui/toast";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import Apiaries from "@/pages/apiaries";
@@ -14,9 +12,9 @@ import GeospatialData from "@/pages/geospatial";
 import LandingPage from "./LandingPage";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
-import { useTheme } from "@/contexts/theme-context";
-import { NotificationProvider } from "@/contexts/notification-context";
-import { ThemeProvider } from "@/contexts/theme-context";
+import { ToastProvider as CustomToastProvider } from "@/components/ui/toast-provider";
+import { ThemeProvider as ComponentThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider as ContextThemeProvider } from "@/contexts/theme-context";
 
 // Layout component for authenticated pages
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
@@ -70,16 +68,18 @@ function AppRoutes() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <NotificationProvider>
-          <Router>
-            <AppRoutes />
-            <Toaster />
-          </Router>
-        </NotificationProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <ContextThemeProvider>
+      <ComponentThemeProvider defaultTheme="system">
+        <CustomToastProvider>
+          <ToastProvider>
+            <Router>
+              <AppRoutes />
+              <ToastViewport />
+            </Router>
+          </ToastProvider>
+        </CustomToastProvider>
+      </ComponentThemeProvider>
+    </ContextThemeProvider>
   );
 }
 
