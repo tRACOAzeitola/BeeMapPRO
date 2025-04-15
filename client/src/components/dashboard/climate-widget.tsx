@@ -3,13 +3,14 @@ import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { Cloud, CloudRain, Sun, Check, RefreshCw, Flower2, AlertTriangle } from "lucide-react";
 import { fetchWeatherForLocation } from "@/lib/weather-service";
+import { Weather } from "@/types/weather";
 
 const ClimateWidget: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // In a real application, we'd fetch the most active apiary's weather data
   // For now, we'll use a default location (Coimbra, Portugal)
-  const { data: weather, refetch, isFetching } = useQuery({
+  const { data: weather, refetch, isFetching } = useQuery<Weather>({
     queryKey: ['/api/weather', 1], // Default to apiary ID 1
     queryFn: () => fetchWeatherForLocation("40.2033, -8.4103"),
   });
@@ -98,8 +99,8 @@ const ClimateWidget: React.FC = () => {
             Próximos Dias
           </h4>
           <div className="grid grid-cols-3 gap-2">
-            {weather?.forecast && Array.isArray(weather.forecast.days) ? (
-              weather.forecast.days.map((day: any, index: number) => (
+            {weather?.forecast?.forecastDays ? (
+              weather.forecast.forecastDays.map((day: any, index: number) => (
                 <div key={index} className="bg-gray-50 dark:bg-gray-700 p-2 rounded-md text-center">
                   <p className="text-xs text-gray-500 dark:text-gray-400">{day.day}</p>
                   <div className="text-amber-400 my-1 flex justify-center">

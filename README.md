@@ -148,6 +148,18 @@ Todos os componentes foram implementados com design responsivo, respeitando o es
 - ✓ Design responsivo adaptado aos temas
 - ✓ Animações suaves de entrada e saída
 
+### Melhorias de Robustez e Tipagem ✓
+- ✓ Implementação de interfaces TypeScript para dados climáticos
+- ✓ Melhorias na tipagem dos componentes para prevenção de erros
+- ✓ Tratamento avançado de erros na comunicação com a API
+- ✓ Sistema de fallback para dados climáticos quando o servidor está indisponível
+
+### Melhorias na Seleção de Área no Mapa ✓
+- ✓ Correção de falhas na seleção de polígonos e retângulos no mapa
+- ✓ Melhorias na detecção de tipo de área desenhada
+- ✓ Tratamento robusto para formas não reconhecidas
+- ✓ Feedback visual aprimorado durante o processo de seleção e análise
+
 ## Página Inicial (Landing Page)
 
 A nossa página inicial foi completamente redesenhada com:

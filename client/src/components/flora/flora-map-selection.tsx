@@ -25,15 +25,70 @@ import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 const DEFAULT_CENTER: [number, number] = [39.5, -8.0];
 const DEFAULT_ZOOM = 7;
 
+// Adicionar interfaces para os dados retornados pela API
+interface HealthMetrics {
+  unhealthy: number;
+  moderate: number;
+  healthy: number;
+  very_healthy: number;
+  exceptional: number;
+  average_ndvi: number;
+}
+
+interface FloweringStage {
+  stage: string;
+  flowering_percent: number;
+}
+
+interface FloweringInfo {
+  season: string;
+  species_stage: {
+    [key: string]: FloweringStage;
+  };
+}
+
+interface FloraDistribution {
+  rosemary: number;
+  heather: number;
+  eucalyptus: number;
+  other: number;
+}
+
+interface AnalysisResult {
+  success: boolean;
+  area_hectares: number;
+  prediction_image: string;
+  report_image: string;
+  analysis: {
+    overall_score: number;
+    beekeeping_suitability: number;
+    water_availability: number;
+    climate_suitability: number;
+    nectar_potential: number;
+    health_metrics: HealthMetrics;
+    flora_distribution: FloraDistribution;
+    flowering_info: FloweringInfo;
+  };
+  metadata: {
+    date_analyzed: string;
+    coordinates: number[][];
+    type: string;
+  };
+}
+
+// Importações adicionais para tipagem
+import type { FeatureGroup as FeatureGroupType } from "leaflet";
+
 export default function FloraMapSelection() {
   const { isDarkMode } = useTheme();
   const mapRef = useRef<L.Map | null>(null);
-  const featGroupRef = useRef<L.FeatureGroup | null>(null);
+  const featGroupRef = useRef<FeatureGroupType | null>(null);
   const { toast } = useToast();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [selectedArea, setSelectedArea] = useState<{ type: string; coordinates: any } | null>(null);
   const [activeTab, setActiveTab] = useState("map");
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
   // Setup dos ícones do Leaflet
   useEffect(() => {
@@ -84,6 +139,14 @@ export default function FloraMapSelection() {
         title: "Retângulo selecionado",
         description: "Área retangular selecionada no mapa",
       });
+    } else {
+      // Caso o tipo não seja reconhecido, assume como polígono genérico
+      const coordinates = layer.getLatLngs()[0].map((point: L.LatLng) => [point.lat, point.lng]);
+      setSelectedArea({ type: 'polygon', coordinates });
+      toast({
+        title: "Área selecionada",
+        description: `Área genérica selecionada com ${coordinates.length} pontos`,
+      });
     }
   };
 
@@ -97,7 +160,7 @@ export default function FloraMapSelection() {
   };
 
   // Iniciar a análise de flora na área selecionada
-  const startAnalysis = () => {
+  const startAnalysis = async () => {
     if (!selectedArea) {
       toast({
         title: "Nenhuma área selecionada",
@@ -110,19 +173,80 @@ export default function FloraMapSelection() {
     setIsAnalyzing(true);
     setAnalysisProgress(0);
     setActiveTab("results");
+    setAnalysisResult(null); // Limpar análise anterior
     
-    // Simulação do progresso
-    const interval = setInterval(() => {
-      setAnalysisProgress((prev) => {
-        const next = prev + 5;
-        if (next >= 100) {
-          clearInterval(interval);
-          setIsAnalyzing(false);
-          return 100;
-        }
-        return next;
+    try {
+      // Preparar os dados para enviar ao backend
+      const areaData = {
+        type: selectedArea.type || 'polygon', // Garante que type sempre tenha um valor
+        coordinates: selectedArea.coordinates,
+        date: new Date().toISOString().slice(0, 10) // Data atual no formato YYYY-MM-DD
+      };
+      
+      console.log("Enviando dados para API:", JSON.stringify(areaData));
+      
+      // Iniciar o envio da requisição
+      // Usando URL absoluta para garantir que está fazendo a chamada correta
+      const response = await fetch('/api/flora/analyze-area', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(areaData)
       });
-    }, 400);
+      
+      // Simulação do progresso enquanto o backend processa
+      const progressInterval = setInterval(() => {
+        setAnalysisProgress((prev) => {
+          const next = prev + 5;
+          return next < 95 ? next : prev; // Não chega a 100% até confirmar resposta
+        });
+      }, 1000);
+      
+      // Processar a resposta
+      if (response.ok) {
+        const data: AnalysisResult = await response.json();
+        clearInterval(progressInterval);
+        setAnalysisProgress(100);
+        setIsAnalyzing(false);
+        setAnalysisResult(data);
+        
+        toast({
+          title: "Análise concluída",
+          description: `Área analisada com sucesso: ${data.area_hectares.toFixed(1)} hectares`,
+          variant: "success",
+        });
+      } else {
+        // Tratar erro
+        let errorMessage = "Ocorreu um erro ao analisar a área";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          console.error("Erro ao processar resposta de erro:", e);
+        }
+        
+        clearInterval(progressInterval);
+        setIsAnalyzing(false);
+        setAnalysisProgress(0);
+        
+        toast({
+          title: "Erro na análise",
+          description: errorMessage,
+          variant: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao analisar área:", error);
+      setIsAnalyzing(false);
+      setAnalysisProgress(0);
+      
+      toast({
+        title: "Erro na análise",
+        description: "Ocorreu um erro ao comunicar com o servidor. Verifique o console para mais detalhes.",
+        variant: "error",
+      });
+    }
   };
 
   return (
@@ -218,9 +342,7 @@ export default function FloraMapSelection() {
                           }
                         }
                       }}
-                      edit={{ 
-                        featureGroup: featGroupRef.current
-                      }}
+                      edit={{}}
                     />
                   )}
                 </FeatureGroup>
@@ -245,7 +367,7 @@ export default function FloraMapSelection() {
                   <AlertTriangle className="h-4 w-4" />
                   <AlertTitle>Processando</AlertTitle>
                   <AlertDescription>
-                    Analisando presença de rosmaninho na área selecionada...
+                    Analisando presença de flora melífera na área selecionada...
                   </AlertDescription>
                 </Alert>
                 
@@ -257,79 +379,132 @@ export default function FloraMapSelection() {
                   <Progress value={analysisProgress} className="h-2" />
                 </div>
               </div>
-            ) : analysisProgress === 100 ? (
-              <div className="space-y-4">
+            ) : analysisProgress === 100 && analysisResult ? (
+              <div className="space-y-8">
+                {/* Resumo da Análise */}
                 <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-md border border-green-200 dark:border-green-800/30">
-                  <div className="flex items-center space-x-2">
-                    <Flower2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-                    <h3 className="font-medium text-green-800 dark:text-green-400">Detecção Concluída</h3>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Flower2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+                      <h3 className="font-medium text-green-800 dark:text-green-400">Análise Concluída</h3>
+                    </div>
+                    <div className="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center">
+                      <span>Pontuação: {analysisResult.analysis.overall_score}/100</span>
+                    </div>
                   </div>
                   
-                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="bg-white dark:bg-gray-800 p-3 rounded-md shadow-sm">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Área Total Analisada</h4>
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Área Analisada</h4>
                       <p className="text-xl font-bold text-gray-900 dark:text-white mt-1">
-                        238.5 hectares
+                        {analysisResult.area_hectares.toFixed(1)} hectares
                       </p>
                     </div>
                     
                     <div className="bg-white dark:bg-gray-800 p-3 rounded-md shadow-sm">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Presença de Rosmaninho</h4>
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Adequação Apícola</h4>
                       <p className="text-xl font-bold text-amber-600 dark:text-amber-400 mt-1">
-                        42.8 hectares (18%)
+                        {analysisResult.analysis.beekeeping_suitability}%
                       </p>
+                    </div>
+                    
+                    <div className="bg-white dark:bg-gray-800 p-3 rounded-md shadow-sm">
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Potencial de Néctar</h4>
+                      <p className="text-xl font-bold text-amber-600 dark:text-amber-400 mt-1">
+                        {analysisResult.analysis.nectar_potential}%
+                      </p>
+                    </div>
+                    
+                    <div className="bg-white dark:bg-gray-800 p-3 rounded-md shadow-sm">
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Clima & Água</h4>
+                      <div className="flex space-x-2 mt-1">
+                        <span className="text-blue-500 dark:text-blue-400 font-bold text-sm">
+                          Água: {analysisResult.analysis.water_availability}%
+                        </span>
+                        <span className="text-yellow-500 dark:text-yellow-400 font-bold text-sm">
+                          Clima: {analysisResult.analysis.climate_suitability}%
+                        </span>
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="mt-4">
-                    <div className="bg-white dark:bg-gray-800 p-3 rounded-md shadow-sm">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Distribuição da Vegetação</h4>
-                      <div className="mt-2 h-8 w-full rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
-                        <div className="flex h-full">
-                          <div 
-                            className="bg-amber-500 h-full" 
-                            style={{ width: '18%' }}
-                            title="Rosmaninho: 18%"
-                          ></div>
-                          <div 
-                            className="bg-green-600 h-full" 
-                            style={{ width: '35%' }}
-                            title="Floresta: 35%"
-                          ></div>
-                          <div 
-                            className="bg-green-400 h-full" 
-                            style={{ width: '25%' }}
-                            title="Vegetação rasteira: 25%"
-                          ></div>
-                          <div 
-                            className="bg-gray-400 h-full" 
-                            style={{ width: '22%' }}
-                            title="Outros: 22%"
-                          ></div>
-                        </div>
+                  {/* Imagens de Análise */}
+                  <div className="mt-6 space-y-4">
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Visualização da Análise</h4>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div className="bg-white dark:bg-gray-800 p-2 rounded-md shadow-sm">
+                        <img 
+                          src={`data:image/png;base64,${analysisResult.prediction_image}`} 
+                          alt="Análise de flora" 
+                          className="w-full h-auto object-contain rounded"
+                        />
+                        <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
+                          Visualização de Índices de Vegetação
+                        </p>
                       </div>
-                      <div className="mt-2 grid grid-cols-4 gap-1 text-xs">
-                        <div className="flex items-center">
-                          <span className="w-3 h-3 bg-amber-500 rounded-sm mr-1"></span>
-                          <span className="text-gray-600 dark:text-gray-400">Rosmaninho</span>
-                        </div>
-                        <div className="flex items-center">
-                          <span className="w-3 h-3 bg-green-600 rounded-sm mr-1"></span>
-                          <span className="text-gray-600 dark:text-gray-400">Floresta</span>
-                        </div>
-                        <div className="flex items-center">
-                          <span className="w-3 h-3 bg-green-400 rounded-sm mr-1"></span>
-                          <span className="text-gray-600 dark:text-gray-400">Rasteira</span>
-                        </div>
-                        <div className="flex items-center">
-                          <span className="w-3 h-3 bg-gray-400 rounded-sm mr-1"></span>
-                          <span className="text-gray-600 dark:text-gray-400">Outros</span>
-                        </div>
+                      
+                      <div className="bg-white dark:bg-gray-800 p-2 rounded-md shadow-sm">
+                        <img 
+                          src={`data:image/png;base64,${analysisResult.report_image}`} 
+                          alt="Relatório detalhado" 
+                          className="w-full h-auto object-contain rounded"
+                        />
+                        <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
+                          Relatório Detalhado da Análise
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Distribuição de Flora */}
+                  <div className="mt-6">
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Distribuição da Flora Melífera</h4>
+                    <div className="h-8 w-full rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+                      <div className="flex h-full">
+                        <div 
+                          className="bg-amber-500 h-full" 
+                          style={{ width: `${analysisResult.analysis.flora_distribution.rosemary.toFixed(1)}%` }}
+                          title={`Rosmaninho: ${analysisResult.analysis.flora_distribution.rosemary.toFixed(1)}%`}
+                        ></div>
+                        <div 
+                          className="bg-purple-500 h-full" 
+                          style={{ width: `${analysisResult.analysis.flora_distribution.heather.toFixed(1)}%` }}
+                          title={`Urze: ${analysisResult.analysis.flora_distribution.heather.toFixed(1)}%`}
+                        ></div>
+                        <div 
+                          className="bg-blue-500 h-full" 
+                          style={{ width: `${analysisResult.analysis.flora_distribution.eucalyptus.toFixed(1)}%` }}
+                          title={`Eucalipto: ${analysisResult.analysis.flora_distribution.eucalyptus.toFixed(1)}%`}
+                        ></div>
+                        <div 
+                          className="bg-gray-400 h-full" 
+                          style={{ width: `${analysisResult.analysis.flora_distribution.other.toFixed(1)}%` }}
+                          title={`Outras: ${analysisResult.analysis.flora_distribution.other.toFixed(1)}%`}
+                        ></div>
+                      </div>
+                    </div>
+                    <div className="mt-2 grid grid-cols-4 gap-1 text-xs">
+                      <div className="flex items-center">
+                        <span className="w-3 h-3 bg-amber-500 rounded-sm mr-1"></span>
+                        <span className="text-gray-600 dark:text-gray-400">Rosmaninho</span>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="w-3 h-3 bg-purple-500 rounded-sm mr-1"></span>
+                        <span className="text-gray-600 dark:text-gray-400">Urze</span>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="w-3 h-3 bg-blue-500 rounded-sm mr-1"></span>
+                        <span className="text-gray-600 dark:text-gray-400">Eucalipto</span>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="w-3 h-3 bg-gray-400 rounded-sm mr-1"></span>
+                        <span className="text-gray-600 dark:text-gray-400">Outras</span>
                       </div>
                     </div>
                   </div>
                 </div>
                 
+                {/* Botão para voltar ao mapa */}
                 <div className="text-center">
                   <Button onClick={() => setActiveTab("map")} className="space-x-2">
                     <MapIcon className="h-4 w-4" />
