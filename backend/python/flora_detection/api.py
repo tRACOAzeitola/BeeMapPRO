@@ -1,5 +1,5 @@
 """
-API for flora detection module
+API para o módulo de detecção de flora
 """
 
 import os
@@ -22,36 +22,36 @@ from rasterio.mask import mask
 
 app = Flask(__name__)
 
-# Global variables for models and configuration
+# Variáveis globais para modelos e configuração
 MODEL_PATH = os.getenv('MODEL_PATH', './models/rosemary_detector.pkl')
-MODEL_TYPE = os.getenv('MODEL_TYPE', 'sklearn')  # 'sklearn' or 'tensorflow'
-THRESHOLD = float(os.getenv('THRESHOLD', '0.5'))  # Threshold for detection
-SENTINEL_HUB_API_KEY = os.getenv('SENTINEL_HUB_API_KEY', '')  # API key for Sentinel Hub
+MODEL_TYPE = os.getenv('MODEL_TYPE', 'sklearn')  # 'sklearn' ou 'tensorflow'
+THRESHOLD = float(os.getenv('THRESHOLD', '0.5'))  # Threshold para detecção
+SENTINEL_HUB_API_KEY = os.getenv('SENTINEL_HUB_API_KEY', '')  # Chave API para Sentinel Hub
 
 @app.route('/api/flora/detect', methods=['POST'])
 def detect_flora():
     """
-    API endpoint for flora detection
+    Endpoint da API para detecção de flora
     
-    POST parameters:
+    Parâmetros POST:
     ----------------
-    image_data : str (base64 encoded image) or file
-        Image data for analysis
+    image_data : str (imagem codificada em base64) ou arquivo
+        Dados da imagem para análise
     
-    Returns:
+    Retorna:
     --------
-    JSON with detection results
+    JSON com resultados da detecção
     """
     try:
-        # Check if the request contains a file or base64 encoded image
+        # Verificar se a solicitação contém um arquivo ou imagem codificada em base64
         if 'image' in request.files:
-            # Save the uploaded file to a temporary location
+            # Salvar o arquivo carregado em um local temporário
             file = request.files['image']
             temp_dir = tempfile.mkdtemp()
             image_path = os.path.join(temp_dir, file.filename)
             file.save(image_path)
         elif 'image_data' in request.json:
-            # Decode base64 image and save to a temporary file
+            # Decodificar imagem base64 e salvar em arquivo temporário
             base64_data = request.json['image_data']
             image_data = base64.b64decode(base64_data)
             temp_dir = tempfile.mkdtemp()
@@ -61,76 +61,76 @@ def detect_flora():
         else:
             return jsonify({
                 'success': False,
-                'error': 'No image data provided'
+                'error': 'Nenhum dado de imagem fornecido'
             }), 400
         
-        # Extract parameters
+        # Extrair parâmetros
         model_path = request.json.get('model_path', MODEL_PATH)
         model_type = request.json.get('model_type', MODEL_TYPE)
         threshold = float(request.json.get('threshold', THRESHOLD))
         
-        # Load model
+        # Carregar modelo
         try:
             model = load_model(model_path, model_type)
         except Exception as e:
             return jsonify({
                 'success': False,
-                'error': f'Failed to load model: {str(e)}'
+                'error': f'Falha ao carregar modelo: {str(e)}'
             }), 500
         
-        # Process the image
+        # Processar a imagem
         try:
-            # Extract bands
+            # Extrair bandas
             bands = extract_sentinel2_bands(image_path)
             
-            # Create RGB composite for visualization
+            # Criar composto RGB para visualização
             rgb = np.stack([bands['red'], bands['green'], bands['blue']], axis=0)
             rgb = np.transpose(rgb, (1, 2, 0))
             
-            # Normalize for visualization
+            # Normalizar para visualização
             rgb_norm = (rgb - rgb.min()) / (rgb.max() - rgb.min())
             
-            # Calculate indices
+            # Calcular índices
             indices = create_spectral_indices(bands)
             
-            # Create feature stack
+            # Criar feature stack
             feature_stack = create_feature_stack(bands, indices)
             
-            # Make prediction
+            # Fazer predição
             detection_result = detect_rosemary(image_path, model_path)
             
-            # Generate visualization
+            # Gerar visualização
             fig, ax = plt.subplots(1, 2, figsize=(12, 6))
             ax[0].imshow(rgb_norm)
-            ax[0].set_title('Original Image')
+            ax[0].set_title('Imagem Original')
             ax[0].axis('off')
             
-            # Plot NDVI for demonstration
+            # Plotar NDVI para demonstração
             ndvi_viz = indices['ndvi']
-            ndvi_viz = np.clip(ndvi_viz, -1, 1)  # Clip to standard NDVI range
+            ndvi_viz = np.clip(ndvi_viz, -1, 1)  # Limitar para faixa padrão de NDVI
             ax[1].imshow(ndvi_viz, cmap='RdYlGn', vmin=-1, vmax=1)
-            ax[1].set_title('NDVI (Vegetation Index)')
+            ax[1].set_title('NDVI (Índice de Vegetação)')
             ax[1].axis('off')
             
-            # Save plot to a BytesIO object
+            # Salvar gráfico em objeto BytesIO
             buf = BytesIO()
             plt.tight_layout()
             plt.savefig(buf, format='png', dpi=100)
             buf.seek(0)
             plt.close(fig)
             
-            # Encode the image to base64
+            # Codificar a imagem em base64
             image_base64 = base64.b64encode(buf.read()).decode('utf-8')
             
-            # Calculate statistics
+            # Calcular estatísticas
             if detection_result is not None:
-                # Count pixels by class
+                # Contar pixels por classe
                 unique, counts = np.unique(detection_result, return_counts=True)
                 stats = dict(zip(unique.tolist(), counts.tolist()))
                 
-                # Calculate percentage of rosemary coverage
+                # Calcular percentagem de cobertura de rosmaninho
                 total_pixels = detection_result.size
-                rosemary_pixels = stats.get(1, 0)  # Class 1 is rosemary
+                rosemary_pixels = stats.get(1, 0)  # Classe 1 é rosmaninho
                 coverage_percent = (rosemary_pixels / total_pixels) * 100 if total_pixels > 0 else 0
             else:
                 stats = {}
@@ -152,16 +152,16 @@ def detect_flora():
         except Exception as e:
             return jsonify({
                 'success': False,
-                'error': f'Image processing error: {str(e)}'
+                'error': f'Erro de processamento de imagem: {str(e)}'
             }), 500
         
     except Exception as e:
         return jsonify({
             'success': False,
-            'error': f'Unexpected error: {str(e)}'
+            'error': f'Erro inesperado: {str(e)}'
         }), 500
     finally:
-        # Clean up temporary files
+        # Limpar arquivos temporários
         if 'temp_dir' in locals() and os.path.exists(temp_dir):
             import shutil
             shutil.rmtree(temp_dir)
@@ -169,23 +169,23 @@ def detect_flora():
 @app.route('/api/flora/analyze-area', methods=['POST'])
 def analyze_area():
     """
-    API endpoint for analyzing a geographic area drawn on the map
+    Endpoint da API para analisar uma área geográfica desenhada no mapa
     
-    POST parameters:
+    Parâmetros POST:
     ----------------
     type : str
-        Type of area ('polygon' or 'rectangle')
+        Tipo de área ('polygon' ou 'rectangle')
     coordinates : list
-        List of [lat, lng] coordinates defining the area
-    date : str, optional
-        Date in format YYYY-MM-DD for temporal analysis
+        Lista de coordenadas [lat, lng] definindo a área
+    date : str, opcional
+        Data no formato AAAA-MM-DD para análise temporal
     
-    Returns:
+    Retorna:
     --------
-    JSON with analysis results
+    JSON com resultados da análise
     """
     try:
-        # Extract parameters from request
+        # Extrair parâmetros da solicitação
         data = request.json
         area_type = data.get('type')
         coordinates = data.get('coordinates')
@@ -194,125 +194,125 @@ def analyze_area():
         if not area_type or not coordinates:
             return jsonify({
                 'success': False,
-                'error': 'Missing area type or coordinates'
+                'error': 'Tipo de área ou coordenadas ausentes'
             }), 400
         
-        # Convert coordinates to a GeoJSON polygon
+        # Converter coordenadas para um polígono GeoJSON
         if area_type == 'polygon':
-            # For polygon, the coordinates are already in the right format
+            # Para polígono, as coordenadas já estão no formato certo
             polygon = shapely.geometry.Polygon(coordinates)
         elif area_type == 'rectangle':
-            # For rectangle, the coordinates are the four corners
+            # Para retângulo, as coordenadas são os quatro cantos
             polygon = shapely.geometry.Polygon(coordinates)
         else:
             return jsonify({
                 'success': False,
-                'error': f'Unsupported area type: {area_type}'
+                'error': f'Tipo de área não suportado: {area_type}'
             }), 400
         
-        # Calculate area in hectares (approximate)
-        # Note: This is a simplified calculation and doesn't account for Earth's curvature
+        # Calcular área em hectares (aproximado)
+        # Observação: Esta é uma calculação simplificada e não leva em conta a curvatura da Terra
         area_m2 = calculate_area_in_m2(polygon)
-        area_hectares = area_m2 / 10000  # Convert m² to hectares
+        area_hectares = area_m2 / 10000  # Converter m² para hectares
         
-        # Check if the area is too large
+        # Verificar se a área é grande demais
         if area_hectares > 1000:  # 1000 hectares = 10 km²
             return jsonify({
                 'success': False,
-                'error': f'Area too large: {area_hectares:.2f} hectares. Maximum allowed is 1000 hectares.'
+                'error': f'Área muito grande: {area_hectares:.2f} hectares. Máximo permitido é 1000 hectares.'
             }), 400
         
-        # Fetch Sentinel-2 imagery for the area
-        # In a real implementation, you would use Sentinel Hub or similar service to get the image
-        # For this example, we'll create a placeholder for demonstration
+        # Buscar imagem Sentinel-2 para a área
+        # Em uma implementação real, você usaria Sentinel Hub ou serviço similar para obter a imagem
+        # Para este exemplo, vamos criar um placeholder para demonstração
         try:
             sentinel_image_path = fetch_sentinel_image(polygon, date_str)
         except Exception as e:
             return jsonify({
                 'success': False,
-                'error': f'Failed to fetch satellite imagery: {str(e)}'
+                'error': f'Falha ao buscar imagem de satélite: {str(e)}'
             }), 500
         
-        # Load the GeoCNN model for analysis
+        # Carregar o modelo GeoCNN para análise
         try:
             geo_cnn = GeoCNN.load(MODEL_PATH)
         except:
-            # If model doesn't exist, create a new one
+            # Se o modelo não existir, criar um novo
             geo_cnn = GeoCNN(input_shape=(10, 64, 64), num_classes=4)
         
-        # Create temporary directory for outputs
+        # Criar diretório temporário para saídas
         temp_dir = tempfile.mkdtemp()
         output_path = os.path.join(temp_dir, 'analysis_result.png')
         
-        # Analyze the area with the GeoCNN model
+        # Analisar a área com o modelo GeoCNN
         try:
-            # Extract bands from the Sentinel image
+            # Extrair bandas da imagem Sentinel
             bands = extract_sentinel2_bands(sentinel_image_path)
             
-            # Calculate indices
+            # Calcular índices
             indices = create_spectral_indices(bands)
             
-            # Run the prediction
+            # Executar a predição
             prediction = geo_cnn.predict_image(
                 sentinel_image_path,
                 output_path=output_path,
                 visualize=True
             )
             
-            # Calculate vegetation health
+            # Calcular saúde da vegetação
             health_metrics = calculate_vegetation_health(indices['ndvi'])
             
-            # Estimate flowering stage if date is provided
+            # Estimar estágio de floração se a data for fornecida
             flowering_info = estimate_flowering_stage(
                 indices['ndvi'],
                 indices['evi'],
                 date_str
             )
             
-            # Create a detailed analysis report
+            # Criar um relatório de análise detalhado
             report_path = os.path.join(temp_dir, 'detailed_report.png')
             create_detailed_report(
                 bands, indices, health_metrics, flowering_info, report_path
             )
             
-            # Encode images to base64 for response
+            # Codificar imagens em base64 para resposta
             with open(output_path, 'rb') as f:
                 prediction_image = base64.b64encode(f.read()).decode('utf-8')
             
             with open(report_path, 'rb') as f:
                 report_image = base64.b64encode(f.read()).decode('utf-8')
             
-            # Calculate approximate flora distribution
-            # In a real implementation, this would come from the model prediction
+            # Calcular distribuição aproximada de flora
+            # Em uma implementação real, isso viria da predição do modelo
             flora_distribution = {
-                'rosemary': health_metrics['healthy'] * 0.8,  # Percentage of rosemary (example)
-                'heather': health_metrics['very_healthy'] * 0.6,  # Percentage of heather (example)
-                'eucalyptus': health_metrics['moderate'] * 0.3,  # Percentage of eucalyptus (example)
+                'rosemary': health_metrics['healthy'] * 0.8,  # Percentagem de rosmaninho (exemplo)
+                'heather': health_metrics['very_healthy'] * 0.6,  # Percentagem de urze (exemplo)
+                'eucalyptus': health_metrics['moderate'] * 0.3,  # Percentagem de eucalipto (exemplo)
                 'other': 100 - (health_metrics['healthy'] * 0.8 + health_metrics['very_healthy'] * 0.6 + health_metrics['moderate'] * 0.3)
             }
             
-            # Create a summary of the analysis
-            # These values would be calculated based on the actual analysis
+            # Criar um resumo da análise
+            # Estes valores seriam calculados com base na análise real
             beekeeping_suitability = min(95, max(30, health_metrics['average_ndvi'] * 100))
-            water_availability = 65  # Example value (0-100)
-            climate_suitability = 80  # Example value (0-100)
+            water_availability = 65  # Valor exemplo (0-100)
+            climate_suitability = 80  # Valor exemplo (0-100)
             
-            # Calculate seasonal nectar potential based on flowering info
+            # Calcular potencial de néctar sazonal com base nas informações de floração
             if flowering_info:
                 nectar_potential = 0
                 for species, info in flowering_info['species_stage'].items():
                     nectar_potential += info['flowering_percent'] * flora_distribution.get(species, 0) / 100
                 nectar_potential = min(100, max(0, nectar_potential))
             else:
-                nectar_potential = 50  # Default value
+                nectar_potential = 50  # Valor padrão
             
-            # Calculate overall score
+            # Calcular pontuação geral
             overall_score = int(0.4 * beekeeping_suitability + 
                               0.2 * water_availability + 
                               0.2 * climate_suitability + 
                               0.2 * nectar_potential)
             
-            # Prepare response
+            # Preparar resposta
             response = {
                 'success': True,
                 'area_hectares': area_hectares,
@@ -340,10 +340,10 @@ def analyze_area():
         except Exception as e:
             return jsonify({
                 'success': False,
-                'error': f'Analysis error: {str(e)}'
+                'error': f'Erro de análise: {str(e)}'
             }), 500
         finally:
-            # Clean up temporary files
+            # Limpar arquivos temporários
             import shutil
             if os.path.exists(temp_dir):
                 shutil.rmtree(temp_dir)
@@ -351,37 +351,37 @@ def analyze_area():
     except Exception as e:
         return jsonify({
             'success': False,
-            'error': f'Unexpected error: {str(e)}'
+            'error': f'Erro inesperado: {str(e)}'
         }), 500
 
 def calculate_area_in_m2(polygon):
     """
-    Calculate approximate area in square meters
+    Calcular área aproximada em metros quadrados
     
-    Parameters:
+    Parâmetros:
     -----------
     polygon : shapely.geometry.Polygon
-        Polygon defining the area
+        Polígono definindo a área
     
-    Returns:
+    Retorna:
     --------
     area : float
-        Approximate area in square meters
+        Área aproximada em metros quadrados
     """
-    # This is a simplified calculation
-    # For more accurate calculations, use GeoPandas with proper projections
-    # or convert to a local UTM projection for the area
+    # Esta é uma calculação simplificada
+    # Para cálculos mais precisos, use GeoPandas com projeções adequadas
+    # ou converta para uma projeção UTM local para a área
     
-    # For small areas, this approximation is reasonable
-    # 1 degree of latitude ≈ 111 km
-    # 1 degree of longitude ≈ 111 km * cos(latitude)
+    # Para áreas pequenas, esta aproximação é razoável
+    # 1 grau de latitude ≈ 111 km
+    # 1 grau de longitude ≈ 111 km * cos(latitude)
     
-    # Calculate centroid latitude for longitude scaling
+    # Calcular latitude do centróide para escala de longitude
     centroid = polygon.centroid
-    lat_scale = 111000  # meters per degree of latitude
-    lng_scale = 111000 * np.cos(np.radians(centroid.y))  # meters per degree of longitude
+    lat_scale = 111000  # metros por grau de latitude
+    lng_scale = 111000 * np.cos(np.radians(centroid.y))  # metros por grau de longitude
     
-    # Create a scaled polygon
+    # Criar um polígono escalado
     scaled_coords = []
     for x, y in polygon.exterior.coords:
         scaled_coords.append((x * lng_scale, y * lat_scale))
@@ -392,49 +392,49 @@ def calculate_area_in_m2(polygon):
 
 def fetch_sentinel_image(polygon, date_str):
     """
-    Fetch Sentinel-2 imagery for the specified area and date
+    Buscar imagem Sentinel-2 para a área e data especificadas
     
-    Parameters:
+    Parâmetros:
     -----------
     polygon : shapely.geometry.Polygon
-        Polygon defining the area
+        Polígono definindo a área
     date_str : str
-        Date in format YYYY-MM-DD
+        Data no formato AAAA-MM-DD
     
-    Returns:
+    Retorna:
     --------
     image_path : str
-        Path to the downloaded Sentinel-2 image
+        Caminho para a imagem Sentinel-2 baixada
     """
-    # This is a placeholder function
-    # In a real implementation, you would use Sentinel Hub API or similar service
+    # Esta é uma função placeholder
+    # Em uma implementação real, você usaria a API Sentinel Hub ou serviço similar
     
-    # For demonstration purposes, we'll create a mock image
-    # In a real application, use the Sentinel Hub API or similar to download actual imagery
+    # Para fins de demonstração, vamos criar uma imagem falsa
+    # Em uma aplicação real, use a API Sentinel Hub ou similar para baixar imagens reais
     
-    # Create a temporary directory for the image
+    # Criar um diretório temporário para a imagem
     temp_dir = tempfile.mkdtemp()
     image_path = os.path.join(temp_dir, 'sentinel_image.tif')
     
-    # Create a mock image with proper structure
-    # This should be replaced with actual Sentinel-2 imagery in production
+    # Criar uma imagem falsa com estrutura adequada
+    # Isto deve ser substituído por imagens reais do Sentinel-2 em produção
     
-    # For demonstration purposes only - create a simple raster
+    # Apenas para fins de demonstração - criar um raster simples
     height, width = 500, 500
-    num_bands = 12  # Sentinel-2 has multiple bands
+    num_bands = 12  # Sentinel-2 tem múltiplas bandas
     
-    # Create random data for each band
+    # Criar dados aleatórios para cada banda
     data = np.random.rand(num_bands, height, width).astype(np.float32)
     
-    # Set transform and CRS
-    # This is a placeholder transform - in practice, use proper georeferencing
+    # Definir transformação e CRS
+    # Esta é uma transformação placeholder - na prática, use georreferenciamento adequado
     transform = rasterio.transform.from_bounds(
         polygon.bounds[0], polygon.bounds[1], 
         polygon.bounds[2], polygon.bounds[3],
         width, height
     )
     
-    # Create a GeoTIFF with the synthetic data
+    # Criar um GeoTIFF com os dados sintéticos
     with rasterio.open(
         image_path,
         'w',
@@ -453,53 +453,53 @@ def fetch_sentinel_image(polygon, date_str):
 
 def create_detailed_report(bands, indices, health_metrics, flowering_info, output_path):
     """
-    Create a detailed report with multiple visualizations
+    Criar um relatório detalhado com múltiplas visualizações
     
-    Parameters:
+    Parâmetros:
     -----------
     bands : dict
-        Dictionary with extracted bands
+        Dicionário com bandas extraídas
     indices : dict
-        Dictionary with calculated spectral indices
+        Dicionário com índices espectrais calculados
     health_metrics : dict
-        Dictionary with vegetation health metrics
+        Dicionário com métricas de saúde da vegetação
     flowering_info : dict
-        Dictionary with flowering stage information
+        Dicionário com informações do estágio de floração
     output_path : str
-        Path to save the report
+        Caminho para salvar o relatório
     """
-    # Create a figure with multiple subplots
+    # Criar uma figura com múltiplos subplots
     fig = plt.figure(figsize=(15, 10))
     
-    # 1. RGB composite
+    # 1. Composto RGB
     ax1 = fig.add_subplot(2, 3, 1)
     rgb = np.stack([bands['red'], bands['green'], bands['blue']], axis=2)
     rgb = (rgb - rgb.min()) / (rgb.max() - rgb.min())
     ax1.imshow(rgb)
-    ax1.set_title('RGB Composite')
+    ax1.set_title('Composto RGB')
     ax1.axis('off')
     
-    # 2. NDVI visualization
+    # 2. Visualização NDVI
     ax2 = fig.add_subplot(2, 3, 2)
     ndvi_display = indices['ndvi']
     ndvi_display = np.clip(ndvi_display, -1, 1)
     im = ax2.imshow(ndvi_display, cmap='RdYlGn', vmin=-1, vmax=1)
     plt.colorbar(im, ax=ax2, label='NDVI')
-    ax2.set_title('NDVI (Vegetation Index)')
+    ax2.set_title('NDVI (Índice de Vegetação)')
     ax2.axis('off')
     
-    # 3. EVI visualization
+    # 3. Visualização EVI
     ax3 = fig.add_subplot(2, 3, 3)
     evi_display = indices['evi']
     evi_display = np.clip(evi_display, -1, 1)
     im = ax3.imshow(evi_display, cmap='RdYlGn', vmin=-1, vmax=1)
     plt.colorbar(im, ax=ax3, label='EVI')
-    ax3.set_title('EVI (Enhanced Vegetation Index)')
+    ax3.set_title('EVI (Índice de Vegetação Melhorado)')
     ax3.axis('off')
     
-    # 4. Vegetation health pie chart
+    # 4. Gráfico de pizza de saúde da vegetação
     ax4 = fig.add_subplot(2, 3, 4)
-    health_labels = ['Unhealthy', 'Moderate', 'Healthy', 'Very Healthy', 'Exceptional']
+    health_labels = ['Não saudável', 'Moderada', 'Saudável', 'Muito Saudável', 'Excepcional']
     health_values = [
         health_metrics['unhealthy'],
         health_metrics['moderate'],
@@ -508,9 +508,9 @@ def create_detailed_report(bands, indices, health_metrics, flowering_info, outpu
         health_metrics['exceptional']
     ]
     ax4.pie(health_values, labels=health_labels, autopct='%1.1f%%')
-    ax4.set_title('Vegetation Health Distribution')
+    ax4.set_title('Distribuição de Saúde da Vegetação')
     
-    # 5. Flowering stage info (if available)
+    # 5. Informações do estágio de floração (se disponível)
     ax5 = fig.add_subplot(2, 3, 5)
     if flowering_info:
         species = list(flowering_info['species_stage'].keys())
@@ -518,30 +518,30 @@ def create_detailed_report(bands, indices, health_metrics, flowering_info, outpu
                                 for info in flowering_info['species_stage'].values()]
         
         ax5.bar(species, flowering_percentages)
-        ax5.set_title(f'Flowering Stage ({flowering_info["season"].capitalize()})')
-        ax5.set_ylabel('Flowering Percentage')
+        ax5.set_title(f'Estágio de Floração ({flowering_info["season"].capitalize()})')
+        ax5.set_ylabel('Percentagem de Floração')
         ax5.set_ylim(0, 110)
     else:
-        ax5.text(0.5, 0.5, 'No flowering information available', 
+        ax5.text(0.5, 0.5, 'Nenhuma informação de floração disponível', 
                ha='center', va='center', fontsize=12)
-        ax5.set_title('Flowering Stage')
+        ax5.set_title('Estágio de Floração')
         ax5.axis('off')
     
-    # 6. Additional information text box
+    # 6. Caixa de texto com informações adicionais
     ax6 = fig.add_subplot(2, 3, 6)
     ax6.axis('off')
-    ax6.text(0.05, 0.95, 'Analysis Summary', fontsize=14, fontweight='bold', 
+    ax6.text(0.05, 0.95, 'Resumo da Análise', fontsize=14, fontweight='bold', 
              va='top')
     
     summary_text = [
-        f'Average NDVI: {health_metrics["average_ndvi"]:.3f}',
-        f'Season: {flowering_info["season"].capitalize() if flowering_info else "Unknown"}',
-        '\nPotential Flora:',
+        f'NDVI Médio: {health_metrics["average_ndvi"]:.3f}',
+        f'Estação: {flowering_info["season"].capitalize() if flowering_info else "Desconhecida"}',
+        '\nFlora Potencial:',
     ]
     
     if flowering_info:
         for species, info in flowering_info['species_stage'].items():
-            summary_text.append(f'  • {species.capitalize()}: {info["stage"].capitalize()} stage')
+            summary_text.append(f'  • {species.capitalize()}: Estágio {info["stage"].capitalize()}')
     
     ax6.text(0.05, 0.85, '\n'.join(summary_text), va='top', fontsize=10)
     
@@ -551,16 +551,16 @@ def create_detailed_report(bands, indices, health_metrics, flowering_info, outpu
 
 def start_server(host='127.0.0.1', port=5001):
     """
-    Start the Flask server
+    Iniciar o servidor Flask
     
-    Parameters:
+    Parâmetros:
     -----------
     host : str, default='127.0.0.1'
-        Host to bind the server to
+        Host para vincular o servidor
     port : int, default=5001
-        Port to bind the server to
+        Porta para vincular o servidor
     """
     app.run(host=host, port=port)
 
 if __name__ == '__main__':
-    start_server(host='0.0.0.0')
+    start_server(host='0.0.0.0') 

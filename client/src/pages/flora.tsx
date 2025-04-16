@@ -34,8 +34,8 @@ export default function FloraPage() {
   // Filter flora types based on search query
   const filteredFloraTypes = floraTypes?.filter(flora => 
     flora.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    flora.scientificName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    flora.description.toLowerCase().includes(searchQuery.toLowerCase())
+    (flora.scientificName?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+    (flora.description?.toLowerCase() || '').includes(searchQuery.toLowerCase())
   );
 
   return (

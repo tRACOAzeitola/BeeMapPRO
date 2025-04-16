@@ -36,7 +36,7 @@ This Python backend provides advanced geospatial analysis and machine learning c
 1. Clone the repository
 ```bash
 git clone https://github.com/your-repo/beekeeping-intelligence.git
-cd beekeeping-intelligence/python
+cd beekeeping-intelligence/backend/python
 ```
 
 2. Create a virtual environment

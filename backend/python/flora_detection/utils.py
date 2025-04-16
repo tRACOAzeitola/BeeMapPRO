@@ -203,28 +203,34 @@ def train_rosemary_detector(feature_stack, training_areas):
     model : RandomForestClassifier
         Trained model
     """
-    # Convert training areas to a raster mask with class labels
-    # This step will depend on your specific data
-    # For simplicity, let's assume we already have a mask with class labels
-    # 0 = background, 1 = rosemary, 2 = other vegetation
+    # Extract training data from the feature stack using the training areas
+    # This is a simplified version and would need to be adapted to your specific data
+    # In a real implementation, you would need to extract the pixels corresponding to
+    # the training areas from the feature stack
     
-    # This is a placeholder - in reality you'd create this from your GeoDataFrame
-    class_mask = np.zeros((feature_stack.shape[0],), dtype=int)
+    # Placeholder for illustration
+    # In a real implementation, you would extract the actual training data
+    X_train = feature_stack[:1000]  # Just use the first 1000 pixels for demonstration
+    y_train = np.random.randint(0, 2, size=1000)  # Random labels for demonstration
     
-    # Split data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(
-        feature_stack, class_mask, test_size=0.3, random_state=42
+    # Split the data into training and validation sets
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train, y_train, test_size=0.2, random_state=42
     )
     
-    # Train a Random Forest classifier
-    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    # Create and train the model
+    model = RandomForestClassifier(
+        n_estimators=100,
+        max_depth=None,
+        random_state=42
+    )
     model.fit(X_train, y_train)
     
     # Evaluate the model
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    conf_matrix = confusion_matrix(y_test, y_pred)
-    class_report = classification_report(y_test, y_pred)
+    y_pred = model.predict(X_val)
+    accuracy = accuracy_score(y_val, y_pred)
+    conf_matrix = confusion_matrix(y_val, y_pred)
+    class_report = classification_report(y_val, y_pred)
     
     print(f"Model accuracy: {accuracy:.4f}")
     print("Confusion matrix:")
@@ -243,101 +249,105 @@ def detect_rosemary(image_path, model_path=None, output_path=None):
     image_path : str
         Path to the Sentinel-2 image
     model_path : str, optional
-        Path to a pretrained model
+        Path to the trained model
     output_path : str, optional
-        Path to save the detection results
+        Path to save the detection result
         
     Returns:
     --------
-    result : numpy array
-        Array with rosemary detection results
+    detection_result : numpy array
+        Array with detection results (0: background, 1: rosemary)
     """
-    # Extract bands
+    # Extract bands and indices
     bands = extract_sentinel2_bands(image_path)
-    
-    # Calculate indices
     indices = create_spectral_indices(bands)
-    
-    # Create feature stack
     feature_stack = create_feature_stack(bands, indices)
     
-    # Load pretrained model if provided
+    # Load the model if provided
     if model_path:
-        # Load model from file
-        # This is a placeholder - implement actual model loading
-        model = None  # Replace with actual model loading
+        from flora_detection.models import load_model
+        model = load_model(model_path)
     else:
-        # Train a new model (for demonstration)
-        # In reality, you would use proper training data
-        # This is just a placeholder to show the workflow
-        print("No model provided. This would normally train a new model.")
-        print("For demonstration only.")
-        return None
+        # Use a simple threshold on NDVI for demonstration
+        print("No model provided, using NDVI threshold for demonstration")
+        
+        # Reshape indices['ndvi'] to match feature_stack shape (pixels, features)
+        h, w = indices['ndvi'].shape
+        detection_result = np.zeros((h, w), dtype=np.int32)
+        
+        # Simple thresholding based on NDVI and SWIR/NIR ratio
+        # These thresholds are just examples and would need to be adjusted
+        # for real-world applications
+        rosemary_mask = (
+            (indices['ndvi'] > 0.3) &  # Healthy vegetation
+            (indices['ndvi'] < 0.7) &  # Not too dense forest
+            (indices['swir_nir_ratio'] > 0.4) &  # Characteristic of certain plants
+            (indices['swir_nir_ratio'] < 0.7)
+        )
+        detection_result[rosemary_mask] = 1  # Class 1: rosemary
+        
+        # Save the result if output_path is provided
+        if output_path:
+            plt.figure(figsize=(10, 10))
+            plt.imshow(detection_result, cmap='viridis')
+            plt.colorbar(label='Class')
+            plt.title('Rosemary Detection Result')
+            plt.savefig(output_path)
+            plt.close()
+        
+        return detection_result
     
-    # Make predictions
-    # This is a placeholder since we don't have a real model here
-    h, w = bands['nir'].shape
-    result = np.zeros((h, w), dtype=int)
+    # Predict using the loaded model
+    detection_result = model.predict(feature_stack)
     
-    # Save results if output path is provided
+    # Reshape the result back to image shape
+    h, w = bands['red'].shape
+    detection_result = detection_result.reshape(h, w)
+    
+    # Save the result if output_path is provided
     if output_path:
-        # Save the results to a GeoTIFF with the same geospatial information as the input
-        with rasterio.open(
-            output_path, 
-            'w',
-            driver='GTiff',
-            height=h,
-            width=w,
-            count=1,
-            dtype=result.dtype,
-            crs=bands['metadata']['crs'],
-            transform=bands['metadata']['transform']
-        ) as dst:
-            dst.write(result, 1)
-            
-    return result
+        plt.figure(figsize=(10, 10))
+        plt.imshow(detection_result, cmap='viridis')
+        plt.colorbar(label='Class')
+        plt.title('Rosemary Detection Result')
+        plt.savefig(output_path)
+        plt.close()
+    
+    return detection_result
 
 def plot_detection_results(original_image, detection_result, output_path=None):
     """
-    Plot the detection results
+    Plot the original image and detection result
     
     Parameters:
     -----------
     original_image : numpy array
         Original RGB image
     detection_result : numpy array
-        Array with rosemary detection results
+        Detection result
     output_path : str, optional
         Path to save the plot
     """
-    fig, ax = plt.subplots(1, 2, figsize=(12, 6))
+    plt.figure(figsize=(15, 8))
     
-    # Plot the original image
-    ax[0].imshow(original_image)
-    ax[0].set_title('Original Image')
-    ax[0].axis('off')
+    # Plot original image
+    plt.subplot(1, 2, 1)
+    plt.imshow(original_image)
+    plt.title('Original Image')
+    plt.axis('off')
     
-    # Plot the detection results
-    # Create a colormap for the detection results
-    # 0 = background (transparent)
-    # 1 = rosemary (purple)
-    # 2 = other vegetation (green)
-    cmap = plt.cm.colors.ListedColormap(['none', 'purple', 'green'])
-    bounds = [0, 0.5, 1.5, 2.5]
-    norm = plt.cm.colors.BoundaryNorm(bounds, cmap.N)
-    
-    ax[1].imshow(original_image)  # background image
-    im = ax[1].imshow(detection_result, cmap=cmap, norm=norm, alpha=0.7)
-    ax[1].set_title('Rosemary Detection')
-    ax[1].axis('off')
-    
-    # Add a colorbar
-    cbar = fig.colorbar(im, ax=ax[1], ticks=[0, 1, 2])
-    cbar.ax.set_yticklabels(['Background', 'Rosemary', 'Other vegetation'])
+    # Plot detection result
+    plt.subplot(1, 2, 2)
+    plt.imshow(detection_result, cmap='viridis')
+    plt.colorbar(label='Class')
+    plt.title('Rosemary Detection')
+    plt.axis('off')
     
     plt.tight_layout()
     
+    # Save the plot if output_path is provided
     if output_path:
-        plt.savefig(output_path, dpi=300, bbox_inches='tight')
-        
-    plt.show()
+        plt.savefig(output_path)
+        plt.close()
+    else:
+        plt.show()

@@ -31,6 +31,7 @@ Revolucionar a apicultura através de uma plataforma integrada que combina geolo
 - ✓ Catálogo de plantas importantes para apicultura
 - ✓ Análise geoespacial de concentração de flora melífera
 - ✓ Deteção de rosmaninho e outras plantas via seleção de área no mapa
+- ✓ Visualização em modo satélite para facilitar a identificação precisa de áreas com vegetação
 - ✓ Análise detalhada com visualização de resultados por área selecionada
 - ✓ Upload e identificação de imagens de flora
 
@@ -123,6 +124,10 @@ Todos os componentes foram implementados com design responsivo, respeitando o es
 - ✓ Visualização geoespacial com mapas interativos
 - ✓ Módulo completo de gestão de flora melífera
 - ✓ Análise de flora por área geográfica via mapa interativo
+- ✓ Mapa com modo satélite para identificação precisa de vegetação e terreno
+- ✓ Visualização de heatmap para concentração de rosmaninho (lavender)
+- ✓ Busca de localização integrada para navegação fácil
+- ✓ Estrutura backend organizada para processamento de dados geoespaciais
 - ✓ Gráficos avançados de produção, saúde e análise ambiental
 - ✓ Sistema preditivo de recomendações baseadas em dados
 - ✓ Sistema de gestão de inventário
@@ -159,6 +164,23 @@ Todos os componentes foram implementados com design responsivo, respeitando o es
 - ✓ Melhorias na detecção de tipo de área desenhada
 - ✓ Tratamento robusto para formas não reconhecidas
 - ✓ Feedback visual aprimorado durante o processo de seleção e análise
+- ✓ Adição de camada de visualização em satélite para facilitar a identificação de áreas de vegetação
+- ✓ Integração de suporte para busca de localização com geocodificação
+- ✓ Adição de visualização de heatmap para concentração de flora melífera
+
+### Reorganização da Estrutura Backend ✓
+- ✓ Implementação de uma estrutura de pastas modular e organizada
+- ✓ Separação clara entre API, serviços, modelos e utilitários
+- ✓ Criação de pasta específica para módulos de detecção de flora
+- ✓ Estrutura de pastas para dados brutos e processados
+- ✓ Organização de rotas em módulos separados (apiários, análises, vegetação)
+- ✓ Centralização de modelos de machine learning em diretório dedicado
+
+### Instalação de Novas Dependências ✓
+- ✓ Adição da biblioteca `leaflet.heat` para visualização de mapas de calor
+- ✓ Implementação de `leaflet-control-geocoder` para busca de localizações
+- ✓ Configuração correta das dependências no ambiente do cliente
+- ✓ Solução de problemas de compatibilidade com TypeScript
 
 ## Página Inicial (Landing Page)
 

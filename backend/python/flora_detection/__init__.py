@@ -1,6 +1,12 @@
 """
-Flora detection package for BeeMap Pro
+Flora Detection Module
+
+This module provides machine learning capabilities for detecting and 
+classifying plant species relevant to beekeeping, with a special focus
+on rosmaninho (lavender) detection from satellite imagery.
 """
+
+__version__ = "1.0.0"
 
 from .utils import (
     calculate_ndvi,

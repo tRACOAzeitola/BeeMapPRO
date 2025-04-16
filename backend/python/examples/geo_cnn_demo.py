@@ -199,42 +199,63 @@ def main():
         if flowering_info:
             species = list(flowering_info['species_stage'].keys())
             flowering_percentages = [info['flowering_percent'] 
-                                    for info in flowering_info['species_stage'].values()]
+                                   for info in flowering_info['species_stage'].values()]
             
             ax5.bar(species, flowering_percentages)
             ax5.set_title(f'Flowering Stage ({flowering_info["season"].capitalize()})')
-            ax5.set_ylabel('Flowering Percentage')
-            ax5.set_ylim(0, 110)
+            ax5.set_ylabel('Flowering %')
+            ax5.set_ylim(0, 100)
         else:
-            ax5.text(0.5, 0.5, 'No date provided for\nflowering stage estimation', 
+            ax5.text(0.5, 0.5, 'No flowering info available', 
                    ha='center', va='center', fontsize=12)
             ax5.set_title('Flowering Stage')
             ax5.axis('off')
         
-        # 6. Additional information text box
+        # 6. Prediction results
         ax6 = fig.add_subplot(2, 3, 6)
+        cmap = plt.cm.get_cmap('viridis', args.num_classes)
+        im = ax6.imshow(prediction, cmap=cmap, vmin=0, vmax=args.num_classes-1)
+        plt.colorbar(im, ax=ax6, label='Class')
+        
+        # Set custom labels for the colorbar
+        class_names = ['Background', 'Rosemary', 'Other vegetation', 'Mixed']
+        if args.num_classes <= len(class_names):
+            plt.colorbar(im, ax=ax6, ticks=range(args.num_classes), label='Class') \
+                .set_ticklabels(class_names[:args.num_classes])
+        
+        ax6.set_title('Flora Distribution')
         ax6.axis('off')
-        ax6.text(0.05, 0.95, 'Analysis Summary', fontsize=14, fontweight='bold', 
-                va='top')
-        
-        summary_text = [
-            f'Average NDVI: {health_metrics["average_ndvi"]:.3f}',
-            f'Image Date: {args.date if args.date else "Not provided"}',
-            f'Season: {flowering_info["season"].capitalize() if flowering_info else "Unknown"}',
-            '\nPotential Flora:',
-        ]
-        
-        if flowering_info:
-            for species, info in flowering_info['species_stage'].items():
-                summary_text.append(f'  • {species.capitalize()}: {info["stage"].capitalize()} stage')
-        
-        ax6.text(0.05, 0.85, '\n'.join(summary_text), va='top', fontsize=10)
         
         plt.tight_layout()
-        report_path = os.path.join(args.output_dir, 'detailed_report.png')
-        plt.savefig(report_path, dpi=300)
+        report_output_path = os.path.join(args.output_dir, 'detailed_report.png')
+        plt.savefig(report_output_path, dpi=300)
         plt.close(fig)
-        print(f"Detailed report saved to {report_path}")
+        print(f"Detailed report saved to {report_output_path}")
+        
+        # Save analysis results as JSON
+        import json
+        
+        analysis_results = {
+            'health_metrics': health_metrics,
+            'flowering_info': flowering_info,
+            'prediction_stats': {
+                'num_classes': args.num_classes,
+                'class_distribution': {
+                    str(i): int(np.sum(prediction == i)) 
+                    for i in range(args.num_classes)
+                }
+            },
+            'metadata': {
+                'image_path': args.input,
+                'date': args.date,
+                'analysis_date': datetime.now().isoformat()
+            }
+        }
+        
+        json_output_path = os.path.join(args.output_dir, 'analysis_results.json')
+        with open(json_output_path, 'w') as f:
+            json.dump(analysis_results, f, indent=4)
+        print(f"Analysis results saved to {json_output_path}")
     
     print("Analysis complete!")
 
