@@ -28,6 +28,10 @@ const DEFAULT_ZOOM = 7;
 // Importações adicionais para tipagem
 import type { FeatureGroup as FeatureGroupType, Layer } from "leaflet";
 
+// Constantes para limites de área
+const MAX_RECOMMENDED_AREA_KM2 = 5; // 5 km² (500 hectares) como limite recomendado
+const ABSOLUTE_MAX_AREA_KM2 = 10; // 10 km² como limite absoluto
+
 export default function FloraMapSelection() {
   const { isDarkMode } = useTheme();
   const mapRef = useRef<L.Map | null>(null);
@@ -165,9 +169,30 @@ export default function FloraMapSelection() {
       
       const perimeterInKm = perimeter / 1000; // Converter para km
       
+      const roundedArea = parseFloat(areaInKm2.toFixed(2));
+      const roundedPerimeter = parseFloat(perimeterInKm.toFixed(2));
+      
+      // Verificar se a área está dentro dos limites recomendados
+      if (roundedArea > ABSOLUTE_MAX_AREA_KM2) {
+        toast({
+          title: "Área muito grande",
+          description: `A área selecionada (${roundedArea} km²) excede o limite máximo de ${ABSOLUTE_MAX_AREA_KM2} km². Por favor, selecione uma área menor.`,
+          variant: "error",
+        });
+        // Não atualizar os valores, manter os anteriores
+        return;
+      } 
+      else if (roundedArea > MAX_RECOMMENDED_AREA_KM2) {
+        toast({
+          title: "Área grande demais para análise precisa",
+          description: `A área selecionada (${roundedArea} km²) excede o tamanho recomendado de ${MAX_RECOMMENDED_AREA_KM2} km². A precisão da análise pode ser reduzida.`,
+          variant: "info",
+        });
+      }
+      
       setAreaMetrics({
-        area: parseFloat(areaInKm2.toFixed(2)),
-        perimeter: parseFloat(perimeterInKm.toFixed(2))
+        area: roundedArea,
+        perimeter: roundedPerimeter
       });
     } catch (error) {
       console.error("Erro ao calcular métricas da área:", error);
@@ -194,6 +219,16 @@ export default function FloraMapSelection() {
       toast({
         title: "Nenhuma área selecionada",
         description: "Por favor, desenhe uma área no mapa para analisar",
+        variant: "error",
+      });
+      return;
+    }
+    
+    // Verificar novamente se a área não é maior que o limite absoluto
+    if (areaMetrics.area > ABSOLUTE_MAX_AREA_KM2) {
+      toast({
+        title: "Área muito grande",
+        description: `A área selecionada (${areaMetrics.area} km²) excede o limite máximo de ${ABSOLUTE_MAX_AREA_KM2} km². Por favor, selecione uma área menor.`,
         variant: "error",
       });
       return;
