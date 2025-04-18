@@ -16,7 +16,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
   icon,
   trend,
   trendType,
-  color,
+  color = "primary", // Default value
 }) => {
   // Map color to Tailwind class and icon
   const colorMap = {
@@ -45,6 +45,9 @@ const StatsCard: React.FC<StatsCardProps> = ({
       text: "text-blue-500",
     },
   };
+
+  // Default color if the provided color is not in the map
+  const colorClasses = colorMap[color] || colorMap.primary;
 
   const trendColorMap = {
     positive: "text-green-500",
@@ -77,7 +80,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
           <h3 className="text-2xl font-semibold text-gray-800 dark:text-white mt-1">{value}</h3>
         </div>
         <div
-          className={`w-10 h-10 rounded-full ${colorMap[color].bgLight} flex items-center justify-center ${colorMap[color].text}`}
+          className={`w-10 h-10 rounded-full ${colorClasses.bgLight} flex items-center justify-center ${colorClasses.text}`}
         >
           {getIcon()}
         </div>

@@ -18,7 +18,7 @@ import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 // Isto precisa estar dentro do componente
 
 interface MapOverviewProps {
-  apiaries: Apiary[];
+  apiaries?: Apiary[];
 }
 
 // Centro do mapa padrão para Portugal
@@ -45,7 +45,7 @@ const getMarkerIcon = (status: string) => {
   });
 };
 
-const MapOverview: React.FC<MapOverviewProps> = ({ apiaries }) => {
+const MapOverview: React.FC<MapOverviewProps> = ({ apiaries = [] }) => {
   const { isDarkMode } = useTheme();
   const mapRef = useRef<L.Map | null>(null);
   
@@ -109,7 +109,7 @@ const MapOverview: React.FC<MapOverviewProps> = ({ apiaries }) => {
             }
           />
           
-          {apiaries.map((apiary) => {
+          {apiaries?.map((apiary) => {
             const status = getApiaryStatus(apiary.id);
             const coordinates = getApiaryCoordinates(apiary.id);
             

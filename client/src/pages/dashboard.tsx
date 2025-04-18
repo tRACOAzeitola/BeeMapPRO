@@ -1,18 +1,41 @@
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import StatsCard from "@/components/dashboard/stats-card";
-import MapOverview from "@/components/dashboard/map-overview";
-import HealthChart from "@/components/dashboard/health-chart";
-import ClimateWidget from "@/components/dashboard/climate-widget";
-import ApiaryList from "@/components/dashboard/apiary-list";
-import HoneyProductionChart from "@/components/dashboard/honey-production-chart";
-import ActivityTemperatureChart from "@/components/dashboard/activity-temperature-chart";
-import VegetationComposition from "@/components/dashboard/vegetation-composition";
-import ProductionForecast from "@/components/dashboard/production-forecast";
-import { apiRequest } from "@/lib/queryClient";
+import { 
+  DndContext, 
+  closestCenter, 
+  KeyboardSensor, 
+  PointerSensor, 
+  useSensor, 
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Card } from '@/components/ui/card';
+import StatsCard from '@/components/dashboard/stats-card';
+import MapOverview from '@/components/dashboard/map-overview';
+import HealthChart from '@/components/dashboard/health-chart';
+import HoneyProductionChart from '@/components/dashboard/honey-production-chart';
+import ActivityTemperatureChart from '@/components/dashboard/activity-temperature-chart';
+import VegetationComposition from '@/components/dashboard/vegetation-composition';
+import ProductionForecast from '@/components/dashboard/production-forecast';
+import ClimateWidget from '@/components/dashboard/climate-widget';
+import ApiaryList from '@/components/dashboard/apiary-list';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { fetchApiaries } from '@/lib/apiary-service';
+import { fetchWeatherForLocation } from '@/lib/weather-service';
+import { Weather } from '@/types/weather';
 
-type DashboardData = {
+// Tipos necessários para os componentes
+interface DashboardData {
   apiaryCount: number;
   hiveCount: number;
   healthRate: number;
@@ -22,9 +45,9 @@ type DashboardData = {
     weak: number;
     dead: number;
   };
-};
+}
 
-type Apiary = {
+interface Apiary {
   id: number;
   name: string;
   location: string;
@@ -32,10 +55,91 @@ type Apiary = {
   floraTypes: string[] | null;
   floraDensity: string | null;
   createdAt: Date | null;
+}
+
+interface StatsCardProps {
+  title: string;
+  value: string;
+  trend: string;
+  percentageChange: number;
+  description: string;
+}
+
+interface HealthChartProps {
+  good: number;
+  weak: number;
+  dead: number;
+  isLoading: boolean;
+}
+
+interface MapOverviewProps {
+  apiaries: Apiary[];
+}
+
+// Tipos de cards disponíveis no dashboard
+const CARD_TYPES = {
+  STATS: 'stats',
+  MAP_HEALTH: 'map_health',
+  PRODUCTION_ACTIVITY: 'production_activity',
+  VEGETATION_FORECAST: 'vegetation_forecast',
+  CLIMATE_APIARIES: 'climate_apiaries',
+};
+
+// Interface para os itens de card
+interface CardItem {
+  id: string;
+  type: string;
+  content: React.ReactNode;
+}
+
+// Componente para card ordenável
+interface SortableCardProps {
+  id: string;
+  children: React.ReactNode;
+}
+
+const SortableCard: React.FC<SortableCardProps> = ({ id, children }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id });
+  
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    marginBottom: '1rem',
+  };
+  
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style}
+      {...attributes} 
+      {...listeners}
+    >
+      <Card className="p-4 cursor-move">
+        {children}
+      </Card>
+    </div>
+  );
 };
 
 export default function Dashboard() {
   const { toast } = useToast();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [cards, setCards] = useState<CardItem[]>([]);
+  
+  // Configure os sensores para reconhecer eventos de arrastar
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Fetch dashboard data
   const { data: dashboardData, isLoading, error } = useQuery<DashboardData>({
@@ -47,6 +151,33 @@ export default function Dashboard() {
     queryKey: ['/api/apiaries'],
   });
 
+  // Fetch weather data
+  const { data: weather } = useQuery<Weather>({ 
+    queryKey: ['weather'], 
+    queryFn: () => fetchWeatherForLocation(39.7436, -8.8071),
+    enabled: activeTab === 'overview'
+  });
+
+  // Função para lidar com o final do arrastar
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      setCards((items) => {
+        const oldIndex = items.findIndex(item => item.id === active.id);
+        const newIndex = items.findIndex(item => item.id === over.id);
+        
+        const newItems = arrayMove(items, oldIndex, newIndex);
+        
+        // Salvar a nova ordem no localStorage
+        const orderIds = newItems.map(card => card.id);
+        localStorage.setItem('dashboardCardOrder', JSON.stringify(orderIds));
+        
+        return newItems;
+      });
+    }
+  };
+
   useEffect(() => {
     if (error) {
       toast({
@@ -57,87 +188,183 @@ export default function Dashboard() {
     }
   }, [error, toast]);
 
+  // Inicialização dos cards
+  useEffect(() => {
+    // Tentar carregar a ordem dos cards do localStorage
+    const savedOrder = localStorage.getItem('dashboardCardOrder');
+    
+    // Cards padrão se não houver ordem salva
+    const defaultCards: CardItem[] = [
+      {
+        id: '1',
+        type: CARD_TYPES.STATS,
+        content: (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <StatsCard
+              title="Colmeias Ativas"
+              value="85%"
+              icon="th-large"
+              trend="up"
+              trendType="positive"
+              color="primary"
+            />
+            <StatsCard
+              title="Produção Mensal"
+              value="156kg"
+              icon="archive"
+              trend="up"
+              trendType="positive"
+              color="success"
+            />
+            <StatsCard
+              title="Saúde Média"
+              value="93%"
+              icon="heartbeat"
+              trend="up"
+              trendType="positive"
+              color="info"
+            />
+            <StatsCard
+              title="Alerta de Apiários"
+              value="2"
+              icon="exclamation-triangle"
+              trend="down"
+              trendType="negative"
+              color="danger"
+            />
+          </div>
+        )
+      },
+      {
+        id: '2',
+        type: CARD_TYPES.MAP_HEALTH,
+        content: (
+          <div className="grid gap-4 md:grid-cols-2">
+            <MapOverview apiaries={apiaries} />
+            <HealthChart good={25} weak={5} dead={2} isLoading={false} />
+          </div>
+        )
+      },
+      {
+        id: '3',
+        type: CARD_TYPES.PRODUCTION_ACTIVITY,
+        content: (
+          <div className="grid gap-4 md:grid-cols-2">
+            <HoneyProductionChart />
+            <ActivityTemperatureChart />
+          </div>
+        )
+      },
+      {
+        id: '4',
+        type: CARD_TYPES.VEGETATION_FORECAST,
+        content: (
+          <div className="grid gap-4 md:grid-cols-3">
+            <VegetationComposition />
+            <div className="md:col-span-2">
+              <ProductionForecast />
+            </div>
+          </div>
+        )
+      },
+      {
+        id: '5',
+        type: CARD_TYPES.CLIMATE_APIARIES,
+        content: (
+          <div className="grid gap-4 md:grid-cols-2">
+            <ClimateWidget weather={weather} />
+            <ApiaryList apiaries={apiaries || []} isLoading={false} />
+          </div>
+        )
+      }
+    ];
+    
+    if (savedOrder) {
+      try {
+        // Carregar ordem salva
+        const orderIds = JSON.parse(savedOrder);
+        const orderedCards = orderIds.map((id: string) => 
+          defaultCards.find(card => card.id === id)
+        ).filter(Boolean);
+        
+        // Verificar se há novos cards que não estão na ordem salva
+        const newCards = defaultCards.filter(
+          card => !orderIds.includes(card.id)
+        );
+        
+        setCards([...orderedCards, ...newCards]);
+      } catch (e) {
+        console.error("Erro ao carregar ordem dos cards:", e);
+        setCards(defaultCards);
+      }
+    } else {
+      setCards(defaultCards);
+    }
+  }, [weather, apiaries]);
+
   return (
-    <div>
-      {/* Dashboard Header */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Dashboard</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Visão geral da sua operação apícola</p>
-      </div>
-      
-      {/* Stats Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-        <StatsCard 
-          title="Total de Apiários"
-          value={isLoading ? "..." : dashboardData?.apiaryCount.toString() || "0"}
-          icon="th-large"
-          trend="+1 no último mês"
-          trendType="positive"
-          color="primary"
-        />
-        
-        <StatsCard 
-          title="Total de Colmeias"
-          value={isLoading ? "..." : dashboardData?.hiveCount.toString() || "0"}
-          icon="archive"
-          trend="+12 no último mês"
-          trendType="positive"
-          color="secondary"
-        />
-        
-        <StatsCard 
-          title="Saúde das Colmeias"
-          value={isLoading ? "..." : `${dashboardData?.healthRate || 0}%`}
-          icon="heartbeat"
-          trend="-2% do mês anterior"
-          trendType="warning"
-          color="success"
-        />
-        
-        <StatsCard 
-          title="Alertas Ativos"
-          value={isLoading ? "..." : dashboardData?.alertCount.toString() || "0"}
-          icon="exclamation-triangle"
-          trend="+3 na última semana"
-          trendType="negative"
-          color="danger"
-        />
-      </div>
-      
-      {/* Two Column Layout for Map and Health Status */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
-        <MapOverview apiaries={apiaries || []} />
-        <HealthChart 
-          good={dashboardData?.hiveStatus.good || 0}
-          weak={dashboardData?.hiveStatus.weak || 0}
-          dead={dashboardData?.hiveStatus.dead || 0}
-          isLoading={isLoading}
-        />
-      </div>
-      
-      {/* Production and Activity Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
-        <HoneyProductionChart isLoading={isLoading} />
-        <ActivityTemperatureChart isLoading={isLoading} />
-      </div>
-      
-      {/* Three Column Layout for Vegetation and Production Forecast */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-        <div className="lg:col-span-1">
-          <VegetationComposition isLoading={isLoading} />
-        </div>
-        <div className="lg:col-span-2">
-          <ProductionForecast isLoading={isLoading} />
+    <main className="container py-6">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <div className="flex items-center gap-4">
+          <Button variant="outline">Exportar Dados</Button>
+          <Button>Adicionar Apiário</Button>
         </div>
       </div>
       
-      {/* Two Column Layout for Climate and Recent Apiaries */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <ClimateWidget />
-        <div className="lg:col-span-2">
-          <ApiaryList apiaries={apiaries || []} isLoading={isLoading} />
-        </div>
-      </div>
-    </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="mb-4">
+          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="production">Produção</TabsTrigger>
+          <TabsTrigger value="health">Saúde</TabsTrigger>
+          <TabsTrigger value="vegetation">Vegetação</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="overview" className="space-y-6">
+          <DndContext 
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext 
+              items={cards.map(card => card.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-4">
+                {cards.map(card => (
+                  <SortableCard key={card.id} id={card.id}>
+                    {card.content}
+                  </SortableCard>
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </TabsContent>
+        
+        <TabsContent value="production">
+          {/* Conteúdo da aba de produção */}
+          <div className="grid gap-4">
+            <HoneyProductionChart />
+            <ProductionForecast />
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="health">
+          {/* Conteúdo da aba de saúde */}
+          <div className="grid gap-4">
+            <HealthChart />
+            <ActivityTemperatureChart />
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="vegetation">
+          {/* Conteúdo da aba de vegetação */}
+          <div className="grid gap-4">
+            <VegetationComposition />
+            <MapOverview />
+          </div>
+        </TabsContent>
+      </Tabs>
+    </main>
   );
 }
