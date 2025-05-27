@@ -3,9 +3,9 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { queryClient, apiRequest } from "@/lib/queryClient";
+import { firestoreQueryClient, firestoreRequest } from "@/lib/firestoreQueryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { type InventoryItem, type Apiary } from "@shared/schema";
+import { type UserInventoryItem as InventoryItem, type Apiary } from "@/models/firestore";
 import { Plus, Pencil, Trash2, Filter, Package } from "lucide-react";
 import {
   Table,
@@ -41,26 +41,21 @@ export default function Inventory() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
-  const [apiaryFilter, setApiaryFilter] = useState<number | "all">("all");
+  const [apiaryFilter, setApiaryFilter] = useState<string | "all">("all");
 
   // Form state
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [quantity, setQuantity] = useState(0);
-  const [apiaryId, setApiaryId] = useState<number | null>(null);
+  const [unit, setUnit] = useState("kg"); // Adicionando o campo unit com valor padrão "kg"
+  const [apiaryId, setApiaryId] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
 
   // Fetch inventory items
   const { data: inventoryItems, isLoading } = useQuery<InventoryItem[]>({
     queryKey: ['/api/inventory', apiaryFilter],
-    queryFn: async () => {
-      const url = apiaryFilter === "all" 
-        ? '/api/inventory' 
-        : `/api/inventory?apiaryId=${apiaryFilter}`;
-      const res = await fetch(url, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch inventory items');
-      return res.json();
-    }
+    // Using the firestoreQueryFn (automatically provided by firestoreQueryClient)
+    // It will parse the endpoint and query params to make the right Firestore calls
   });
 
   // Fetch apiaries for filter dropdown
@@ -71,15 +66,14 @@ export default function Inventory() {
   // Create inventory item mutation
   const createMutation = useMutation({
     mutationFn: async (item: Omit<InventoryItem, 'id'>) => {
-      const res = await apiRequest('POST', '/api/inventory', item);
-      return res.json();
+      return await firestoreRequest('/api/inventory', 'POST', item);
     },
     onSuccess: () => {
       toast({
         title: "Item adicionado",
         description: "O item foi adicionado ao inventário com sucesso",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/inventory'] });
+      firestoreQueryClient.invalidateQueries({ queryKey: ['/api/inventory'] });
       setIsFormOpen(false);
       resetForm();
     },
@@ -94,16 +88,15 @@ export default function Inventory() {
 
   // Update inventory item mutation
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number, data: Partial<InventoryItem> }) => {
-      const res = await apiRequest('PUT', `/api/inventory/${id}`, data);
-      return res.json();
+    mutationFn: async ({ id, data }: { id: string, data: Partial<InventoryItem> }) => {
+      return await firestoreRequest(`/api/inventory/${id}`, 'PUT', data);
     },
     onSuccess: () => {
       toast({
         title: "Item atualizado",
         description: "O item foi atualizado com sucesso",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/inventory'] });
+      firestoreQueryClient.invalidateQueries({ queryKey: ['/api/inventory'] });
       setIsFormOpen(false);
       setSelectedItem(null);
       resetForm();
@@ -119,15 +112,15 @@ export default function Inventory() {
 
   // Delete inventory item mutation
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await apiRequest('DELETE', `/api/inventory/${id}`);
+    mutationFn: async (id: string) => {
+      await firestoreRequest(`/api/inventory/${id}`, 'DELETE');
     },
     onSuccess: () => {
       toast({
         title: "Item excluído",
         description: "O item foi excluído com sucesso",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/inventory'] });
+      firestoreQueryClient.invalidateQueries({ queryKey: ['/api/inventory'] });
       setIsDeleteDialogOpen(false);
       setSelectedItem(null);
     },
@@ -189,6 +182,7 @@ export default function Inventory() {
       name,
       category,
       quantity,
+      unit, // Adicionando o campo unit que é requerido pelo tipo UserInventoryItem
       apiaryId,
       notes,
     };
@@ -201,7 +195,7 @@ export default function Inventory() {
   };
 
   // Get apiary name by id
-  const getApiaryName = (apiaryId: number) => {
+  const getApiaryName = (apiaryId: string) => {
     const apiary = apiaries?.find(a => a.id === apiaryId);
     return apiary ? apiary.name : 'Desconhecido';
   };
@@ -225,8 +219,8 @@ export default function Inventory() {
           <Filter size={16} className="text-muted-foreground" />
           <span className="text-sm text-muted-foreground">Filtrar por apiário:</span>
           <Select
-            value={apiaryFilter.toString()}
-            onValueChange={(value) => setApiaryFilter(value === "all" ? "all" : parseInt(value))}
+            value={apiaryFilter}
+            onValueChange={(value) => setApiaryFilter(value)}
           >
             <SelectTrigger className="w-[250px]">
               <SelectValue placeholder="Selecionar apiário" />
@@ -234,7 +228,7 @@ export default function Inventory() {
             <SelectContent>
               <SelectItem value="all">Todos os apiários</SelectItem>
               {apiaries?.map((apiary) => (
-                <SelectItem key={apiary.id} value={apiary.id.toString()}>
+                <SelectItem key={apiary.id} value={apiary.id}>
                   {apiary.name}
                 </SelectItem>
               ))}
@@ -296,7 +290,8 @@ export default function Inventory() {
                         size="sm"
                         variant="ghost"
                         onClick={() => handleDelete(item)}
-                        className="text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/20"
+                        className="text-destructive"
+                        disabled={item.apiaryId === import.meta.env.VITE_DEFAULT_APIARY_ID}
                       >
                         <Trash2 size={16} />
                       </Button>
@@ -363,15 +358,15 @@ export default function Inventory() {
               <div className="space-y-2">
                 <Label htmlFor="apiaryId">Apiário</Label>
                 <Select
-                  value={apiaryId?.toString() || ""}
-                  onValueChange={(value) => setApiaryId(parseInt(value))}
+                  value={apiaryId || ""}
+                  onValueChange={(value) => setApiaryId(value)}
                 >
                   <SelectTrigger id="apiaryId">
                     <SelectValue placeholder="Selecione um apiário" />
                   </SelectTrigger>
                   <SelectContent>
                     {apiaries?.map((apiary) => (
-                      <SelectItem key={apiary.id} value={apiary.id.toString()}>
+                      <SelectItem key={apiary.id} value={apiary.id}>
                         {apiary.name}
                       </SelectItem>
                     ))}

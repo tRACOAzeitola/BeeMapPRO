@@ -1,13 +1,17 @@
 import {
-  users, type User, type InsertUser,
-  apiaries, type Apiary, type InsertApiary,
-  hives, type Hive, type InsertHive,
-  inventoryItems, type InventoryItem, type InsertInventoryItem,
-  weatherData, type WeatherData, type InsertWeatherData,
-  floraTypes, type FloraType, type InsertFloraType
+  type User, type InsertUser,
+  type Apiary, type InsertApiary,
+  type Hive, type InsertHive,
+  type InventoryItem, type InsertInventoryItem,
+  type WeatherData, type InsertWeatherData,
+  type FloraType, type InsertFloraType
 } from "@shared/schema";
-import { db } from "./db";
-import { eq, desc, and } from "drizzle-orm";
+import { db, collections } from "./db";
+import { 
+  addDoc, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, where, 
+  query, orderBy, limit, collection, DocumentData, QueryDocumentSnapshot, 
+  SnapshotOptions, Query
+} from "firebase/firestore";
 
 export interface IStorage {
   // User methods (from original)
@@ -50,208 +54,290 @@ export interface IStorage {
   deleteFloraType(id: number): Promise<boolean>;
 }
 
+// Helper function to convert Firestore docs to our types
+function convertFirestoreDoc<T>(doc: QueryDocumentSnapshot<DocumentData>): T & { id: number } {
+  const data = doc.data() as any;
+  return { ...data, id: parseInt(doc.id) };
+}
+
 export class DatabaseStorage implements IStorage {
   // User methods (from original)
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
+    const docRef = doc(collections.users, id.toString());
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { ...docSnap.data() as User, id };
+    }
+    return undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user;
+    const q = query(collections.users, where('username', '==', username));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      const doc = querySnapshot.docs[0];
+      return { ...doc.data() as User, id: parseInt(doc.id) };
+    }
+    return undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
-    return user;
+    // Find max ID or start with 1
+    const querySnapshot = await getDocs(collections.users);
+    const nextId = querySnapshot.empty ? 1 : Math.max(...querySnapshot.docs.map(doc => parseInt(doc.id))) + 1;
+    
+    await setDoc(doc(collections.users, nextId.toString()), insertUser);
+    return { ...insertUser, id: nextId } as User;
   }
 
   // Apiary methods
   async getApiaries(): Promise<Apiary[]> {
-    return await db.select().from(apiaries);
+    const querySnapshot = await getDocs(collections.apiaries);
+    return querySnapshot.docs.map(doc => ({ ...doc.data() as Apiary, id: parseInt(doc.id) }));
   }
 
   async getApiary(id: number): Promise<Apiary | undefined> {
-    const [apiary] = await db.select().from(apiaries).where(eq(apiaries.id, id));
-    return apiary;
+    const docRef = doc(collections.apiaries, id.toString());
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { ...docSnap.data() as Apiary, id };
+    }
+    return undefined;
   }
 
   async createApiary(insertApiary: InsertApiary): Promise<Apiary> {
-    const [apiary] = await db.insert(apiaries).values(insertApiary).returning();
-    return apiary;
+    // Find max ID or start with 1
+    const querySnapshot = await getDocs(collections.apiaries);
+    const nextId = querySnapshot.empty ? 1 : Math.max(...querySnapshot.docs.map(doc => parseInt(doc.id))) + 1;
+    
+    await setDoc(doc(collections.apiaries, nextId.toString()), insertApiary);
+    return { ...insertApiary, id: nextId } as Apiary;
   }
 
   async updateApiary(id: number, updates: Partial<InsertApiary>): Promise<Apiary | undefined> {
-    const [updatedApiary] = await db
-      .update(apiaries)
-      .set(updates)
-      .where(eq(apiaries.id, id))
-      .returning();
-    return updatedApiary;
+    const docRef = doc(collections.apiaries, id.toString());
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) return undefined;
+    
+    await updateDoc(docRef, updates as any);
+    
+    // Get the updated document
+    const updatedDoc = await getDoc(docRef);
+    return { ...updatedDoc.data() as Apiary, id };
   }
 
   async deleteApiary(id: number): Promise<boolean> {
-    const [deletedApiary] = await db
-      .delete(apiaries)
-      .where(eq(apiaries.id, id))
-      .returning({ id: apiaries.id });
-    return !!deletedApiary;
+    const docRef = doc(collections.apiaries, id.toString());
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) return false;
+    
+    await deleteDoc(docRef);
+    return true;
   }
 
   // Hive methods
   async getHives(apiaryId?: number): Promise<Hive[]> {
+    let q: Query<DocumentData, DocumentData> = collections.hives;
+    
     if (apiaryId) {
-      return await db.select().from(hives).where(eq(hives.apiaryId, apiaryId));
+      q = query(collections.hives, where('apiaryId', '==', apiaryId));
     }
-    return await db.select().from(hives);
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ ...doc.data() as Hive, id: parseInt(doc.id) }));
   }
 
   async getHive(id: number): Promise<Hive | undefined> {
-    const [hive] = await db.select().from(hives).where(eq(hives.id, id));
-    return hive;
+    const docRef = doc(collections.hives, id.toString());
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { ...docSnap.data() as Hive, id };
+    }
+    return undefined;
   }
 
   async getHivesByApiary(apiaryId: number): Promise<Hive[]> {
-    return await db.select().from(hives).where(eq(hives.apiaryId, apiaryId));
+    const q = query(collections.hives, where('apiaryId', '==', apiaryId));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ ...doc.data() as Hive, id: parseInt(doc.id) }));
   }
 
   async createHive(insertHive: InsertHive): Promise<Hive> {
-    const [hive] = await db.insert(hives).values(insertHive).returning();
-    return hive;
+    // Find max ID or start with 1
+    const querySnapshot = await getDocs(collections.hives);
+    const nextId = querySnapshot.empty ? 1 : Math.max(...querySnapshot.docs.map(doc => parseInt(doc.id))) + 1;
+    
+    await setDoc(doc(collections.hives, nextId.toString()), insertHive);
+    return { ...insertHive, id: nextId } as Hive;
   }
 
   async updateHive(id: number, updates: Partial<InsertHive>): Promise<Hive | undefined> {
-    const [updatedHive] = await db
-      .update(hives)
-      .set(updates)
-      .where(eq(hives.id, id))
-      .returning();
-    return updatedHive;
+    const docRef = doc(collections.hives, id.toString());
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) return undefined;
+    
+    await updateDoc(docRef, updates as any);
+    
+    // Get the updated document
+    const updatedDoc = await getDoc(docRef);
+    return { ...updatedDoc.data() as Hive, id };
   }
 
   async deleteHive(id: number): Promise<boolean> {
-    const [deletedHive] = await db
-      .delete(hives)
-      .where(eq(hives.id, id))
-      .returning({ id: hives.id });
-    return !!deletedHive;
+    const docRef = doc(collections.hives, id.toString());
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) return false;
+    
+    await deleteDoc(docRef);
+    return true;
   }
 
   // Inventory methods
   async getInventoryItems(apiaryId?: number): Promise<InventoryItem[]> {
+    let q: Query<DocumentData, DocumentData> = collections.inventoryItems;
+    
     if (apiaryId) {
-      return await db
-        .select()
-        .from(inventoryItems)
-        .where(eq(inventoryItems.apiaryId, apiaryId));
+      q = query(collections.inventoryItems, where('apiaryId', '==', apiaryId));
     }
-    return await db.select().from(inventoryItems);
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ ...doc.data() as InventoryItem, id: parseInt(doc.id) }));
   }
 
   async getInventoryItem(id: number): Promise<InventoryItem | undefined> {
-    const [item] = await db
-      .select()
-      .from(inventoryItems)
-      .where(eq(inventoryItems.id, id));
-    return item;
+    const docRef = doc(collections.inventoryItems, id.toString());
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { ...docSnap.data() as InventoryItem, id };
+    }
+    return undefined;
   }
 
   async createInventoryItem(insertItem: InsertInventoryItem): Promise<InventoryItem> {
-    const [item] = await db
-      .insert(inventoryItems)
-      .values(insertItem)
-      .returning();
-    return item;
+    // Find max ID or start with 1
+    const querySnapshot = await getDocs(collections.inventoryItems);
+    const nextId = querySnapshot.empty ? 1 : Math.max(...querySnapshot.docs.map(doc => parseInt(doc.id))) + 1;
+    
+    await setDoc(doc(collections.inventoryItems, nextId.toString()), insertItem);
+    return { ...insertItem, id: nextId } as InventoryItem;
   }
 
   async updateInventoryItem(id: number, updates: Partial<InsertInventoryItem>): Promise<InventoryItem | undefined> {
-    const [updatedItem] = await db
-      .update(inventoryItems)
-      .set(updates)
-      .where(eq(inventoryItems.id, id))
-      .returning();
-    return updatedItem;
+    const docRef = doc(collections.inventoryItems, id.toString());
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) return undefined;
+    
+    await updateDoc(docRef, updates as any);
+    
+    // Get the updated document
+    const updatedDoc = await getDoc(docRef);
+    return { ...updatedDoc.data() as InventoryItem, id };
   }
 
   async deleteInventoryItem(id: number): Promise<boolean> {
-    const [deletedItem] = await db
-      .delete(inventoryItems)
-      .where(eq(inventoryItems.id, id))
-      .returning({ id: inventoryItems.id });
-    return !!deletedItem;
+    const docRef = doc(collections.inventoryItems, id.toString());
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) return false;
+    
+    await deleteDoc(docRef);
+    return true;
   }
 
   // Weather data methods
   async getWeatherData(apiaryId: number): Promise<WeatherData | undefined> {
-    const [latestWeatherData] = await db
-      .select()
-      .from(weatherData)
-      .where(eq(weatherData.apiaryId, apiaryId))
-      .orderBy(desc(weatherData.date))
-      .limit(1);
-    return latestWeatherData;
+    const q = query(
+      collections.weatherData, 
+      where('apiaryId', '==', apiaryId),
+      orderBy('date', 'desc'),
+      limit(1)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      const doc = querySnapshot.docs[0];
+      return { ...doc.data() as WeatherData, id: parseInt(doc.id) };
+    }
+    return undefined;
   }
 
   async getWeatherDataHistory(apiaryId: number): Promise<WeatherData[]> {
-    return await db
-      .select()
-      .from(weatherData)
-      .where(eq(weatherData.apiaryId, apiaryId))
-      .orderBy(desc(weatherData.date));
+    const q = query(
+      collections.weatherData, 
+      where('apiaryId', '==', apiaryId),
+      orderBy('date', 'desc')
+    );
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ ...doc.data() as WeatherData, id: parseInt(doc.id) }));
   }
 
   async saveWeatherData(insertData: InsertWeatherData): Promise<WeatherData> {
-    const [data] = await db
-      .insert(weatherData)
-      .values(insertData)
-      .returning();
-    return data;
+    // Find max ID or start with 1
+    const querySnapshot = await getDocs(collections.weatherData);
+    const nextId = querySnapshot.empty ? 1 : Math.max(...querySnapshot.docs.map(doc => parseInt(doc.id))) + 1;
+    
+    await setDoc(doc(collections.weatherData, nextId.toString()), insertData);
+    return { ...insertData, id: nextId } as WeatherData;
   }
 
   // Flora types methods
   async getFloraTypes(): Promise<FloraType[]> {
-    return await db.select().from(floraTypes);
+    const querySnapshot = await getDocs(collections.floraTypes);
+    return querySnapshot.docs.map(doc => ({ ...doc.data() as FloraType, id: parseInt(doc.id) }));
   }
 
   async getFloraType(id: number): Promise<FloraType | undefined> {
-    const [floraType] = await db
-      .select()
-      .from(floraTypes)
-      .where(eq(floraTypes.id, id));
-    return floraType;
+    const docRef = doc(collections.floraTypes, id.toString());
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { ...docSnap.data() as FloraType, id };
+    }
+    return undefined;
   }
 
   async createFloraType(insertFloraType: InsertFloraType): Promise<FloraType> {
-    const [floraType] = await db
-      .insert(floraTypes)
-      .values(insertFloraType)
-      .returning();
-    return floraType;
+    // Find max ID or start with 1
+    const querySnapshot = await getDocs(collections.floraTypes);
+    const nextId = querySnapshot.empty ? 1 : Math.max(...querySnapshot.docs.map(doc => parseInt(doc.id))) + 1;
+    
+    await setDoc(doc(collections.floraTypes, nextId.toString()), insertFloraType);
+    return { ...insertFloraType, id: nextId } as FloraType;
   }
 
   async updateFloraType(id: number, updates: Partial<InsertFloraType>): Promise<FloraType | undefined> {
-    const [updatedFloraType] = await db
-      .update(floraTypes)
-      .set(updates)
-      .where(eq(floraTypes.id, id))
-      .returning();
-    return updatedFloraType;
+    const docRef = doc(collections.floraTypes, id.toString());
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) return undefined;
+    
+    await updateDoc(docRef, updates as any);
+    
+    // Get the updated document
+    const updatedDoc = await getDoc(docRef);
+    return { ...updatedDoc.data() as FloraType, id };
   }
 
   async deleteFloraType(id: number): Promise<boolean> {
-    const [deletedFloraType] = await db
-      .delete(floraTypes)
-      .where(eq(floraTypes.id, id))
-      .returning({ id: floraTypes.id });
-    return !!deletedFloraType;
+    const docRef = doc(collections.floraTypes, id.toString());
+    const docSnap = await getDoc(docRef);
+    
+    if (!docSnap.exists()) return false;
+    
+    await deleteDoc(docRef);
+    return true;
   }
 
   // Helper method to seed initial data
   async seedInitialData() {
-    // Check if we already have data in the flora_types table
-    const existingFlora = await db.select().from(floraTypes);
-    if (existingFlora.length > 0) {
+    // Check if we already have data in the flora_types collection
+    const querySnapshot = await getDocs(collections.floraTypes);
+    if (!querySnapshot.empty) {
       console.log("Database already contains data, skipping seed");
       return;
     }
